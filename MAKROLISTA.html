@@ -1,0 +1,2820 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#F4F5F1">
+<meta name="format-detection" content="telephone=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Makrolista">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20512%20512'%3E%3Crect%20width='512'%20height='512'%20rx='112'%20fill='%230E100D'/%3E%3Crect%20x='176'%20y='176'%20width='160'%20height='160'%20rx='28'%20fill='%23BFEF45'%20transform='rotate(45%20256%20256)'/%3E%3C/svg%3E">
+<title>Makrolista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Vaalea variantti (sama energinen identiteetti) */
+:root{
+  --bg:#F4F5F1; --card:#FFFFFF; --elev:#F4F5F1; --ink:#16190F; --muted:#6B7062; --line:#E5E7DF;
+  --accent:#C6F24E; --accent-ink:#1A2208; --accent-2:#5C8A14; --accent-soft:#EDF6D6;
+  --p:#3A9968; --h:#C08A1E; --r:#D26A48; --eur:#5C8A14; --danger:#C2453A;
+  --field:#F4F5F1; --soft:#F0F1EC; --soft2:#F7F8F4; --track:#E7E9E1; --off:#CBD0C4; --danger-soft:#F8E8E6;
+  --faint:#B9BEB1; --warn-bg:#FBF1DE; --warn-ink:#8A6A22;
+  --water:#3E92AE; --water-soft:#E3EFF2;
+  --shadow:0 4px 16px -12px rgba(20,30,15,.22);
+  color-scheme:light;
+}
+/* Tumma energinen (sankari) */
+html.dark{
+  --bg:#0E100D; --card:#181B16; --elev:#20241E; --ink:#F1F3EC; --muted:#888D80; --line:#2A2E26;
+  --accent:#BFEF45; --accent-ink:#14180C; --accent-2:#BFEF45; --accent-soft:#1E2615;
+  --p:#5BD08C; --h:#E8B53F; --r:#EC7C5A; --eur:#BFEF45; --danger:#EC6A5A;
+  --field:#20241E; --soft:#20241E; --soft2:#181B16; --track:#272B23; --off:#3A4034; --danger-soft:#2E1B17;
+  --faint:#4A5043; --warn-bg:#2A2614; --warn-ink:#E8C24A;
+  --water:#54B6D6; --water-soft:#17262C;
+  --shadow:0 10px 26px -14px rgba(0,0,0,.75);
+  color-scheme:dark;
+  background-color:#0E100D;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;background-color:#F4F5F1}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{
+  background:var(--bg); min-height:100vh; color:var(--ink);
+  font-family:'Geist',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:14px; padding:18px 16px 110px; font-variant-numeric:tabular-nums;
+}
+.container{max-width:560px;margin:0 auto}
+.outfit{font-family:'Geist',-apple-system,sans-serif}
+button{font-family:inherit;cursor:pointer;color:inherit}
+input,select{font-family:inherit;font-size:15px;color:var(--ink)}
+
+/* ---------- Yläpalkki ---------- */
+.appbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.logo{font-family:'Geist',sans-serif;font-weight:700;font-size:21px;letter-spacing:-.3px;display:flex;align-items:center}
+.logo i{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--accent);margin-right:9px;transform:rotate(45deg)}
+.iconbtn{width:38px;height:38px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted)}
+
+.h2{font-family:'Geist',sans-serif;font-weight:600;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:22px 2px 11px}
+
+/* ---------- Tavoitekortti ---------- */
+.target{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.t-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.t-kcal{font-family:'Geist',sans-serif;font-weight:700;font-size:33px;letter-spacing:-1px}
+.t-goal{font-size:13px;color:var(--muted)}
+.t-left{margin-left:auto;font-size:12px;font-weight:600;color:var(--accent-2);background:var(--accent-soft);padding:4px 10px;border-radius:99px;white-space:nowrap}
+.t-left.over{color:var(--danger);background:var(--danger-soft)}
+.macro{margin-top:13px}
+.m-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+.m-row b{font-weight:600}
+.m-row span{color:var(--muted)}
+.track{height:8px;border-radius:99px;background:var(--track);overflow:hidden}
+.fill{height:100%;border-radius:99px;transition:width .3s}
+
+/* ---------- Tänään: otsikko, viikkonauha, makrorengas ---------- */
+.bigtitle{font-family:'Geist',sans-serif;font-weight:700;font-size:38px;letter-spacing:-1.6px;line-height:1;margin:4px 0 0}
+.pagetitle{margin:4px 0 20px}
+.todaymeta{font-size:12.5px;color:var(--muted);margin:9px 2px 16px;font-weight:500}
+.weekstrip{display:flex;align-items:center;gap:2px;margin-bottom:20px}
+.weekstrip .wk{width:26px;height:36px;border:none;background:none;color:var(--muted);font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.weekstrip .wk:disabled{opacity:.3}
+.wdays{display:flex;flex:1;justify-content:space-between}
+.wday{display:flex;flex-direction:column;align-items:center;gap:7px;background:none;border:none;padding:0;flex:1}
+.wday .wl{font-size:10.5px;color:var(--muted);font-weight:500}
+.wday .wb{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--ink);border:1.5px solid var(--line)}
+.wday.future{opacity:.4}
+.wday.logged .wb{border-color:var(--p);color:var(--p)}
+.wday.today .wb{border-color:var(--accent-2);color:var(--accent-2);font-weight:700}
+.wday.sel .wb{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.ringcard{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;display:flex;align-items:center;gap:18px;box-shadow:var(--shadow);width:100%;text-align:left;color:var(--ink)}
+.ringwrap{position:relative;width:150px;height:150px;flex-shrink:0}
+.ringwrap .rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ringwrap .rc .rl{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-2);font-weight:700;margin-bottom:3px}
+.ringwrap .rc .rn{font-size:29px;font-weight:700;letter-spacing:-1px;line-height:1}
+.ringwrap .rc .ru{font-size:10.5px;color:var(--muted);margin-top:4px}
+.rmlist{flex:1;display:flex;flex-direction:column;gap:14px}
+.rm{display:flex;align-items:center;gap:11px}
+.rmbar{width:7px;height:34px;border-radius:4px;background:var(--track);position:relative;overflow:hidden;flex-shrink:0}
+.rmbar>span{position:absolute;bottom:0;left:0;right:0;border-radius:4px}
+.rmv{font-size:15px;font-weight:700;line-height:1}
+.rmv small{font-size:11px;color:var(--muted);font-weight:500}
+.rml{font-size:11px;color:var(--muted);margin-top:3px;font-weight:500}
+
+/* ---------- Kortit & listat ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:13px;box-shadow:var(--shadow);width:100%;text-align:left}
+.m-ic{width:42px;height:42px;min-width:42px;border-radius:14px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:20px}
+.m-info{flex:1;min-width:0}
+.m-name{font-family:'Geist',sans-serif;font-weight:600;font-size:15px}
+.m-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.m-sub b.bp{color:var(--p);font-weight:600}.m-sub b.bh{color:var(--h);font-weight:600}.m-sub b.br{color:var(--r);font-weight:600}
+.m-kcal{text-align:right}
+.m-kcal .k{font-family:'Geist',sans-serif;font-weight:700;font-size:17px}
+.m-kcal .e{font-size:12px;color:var(--eur);font-weight:600}
+.chev{color:var(--faint);font-size:18px}
+
+.empty{border:1.5px dashed var(--line);border-radius:18px;padding:28px 18px;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.5;background:transparent}
+
+/* ---------- FAB ---------- */
+.fab{position:fixed;bottom:calc(86px + env(safe-area-inset-bottom));right:16px;height:54px;padding:0 22px;border-radius:16px;background:var(--accent);color:var(--accent-ink);border:none;font-family:'Geist',sans-serif;font-weight:700;font-size:15px;display:none;align-items:center;gap:8px;box-shadow:0 12px 26px -12px rgba(0,0,0,.45);z-index:5}
+.fab.show{display:flex}
+
+/* ---------- Alanavigaatio ---------- */
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;z-index:10;padding-bottom:env(safe-area-inset-bottom)}
+.nv{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:500;color:var(--muted);padding:10px 0 8px;border:none;background:none}
+.nv .ic{display:flex;align-items:center;justify-content:center;height:24px}
+.nv .ic svg{width:23px;height:23px;display:block}
+.nv .dot{width:4px;height:4px;border-radius:99px;background:transparent}
+.nv.on{color:var(--accent-2);font-weight:600}
+.nv.on .dot{background:var(--accent-2)}
+
+.page{display:none}
+.page.active{display:block}
+
+/* ---------- Aterian muokkaus ---------- */
+.backrow{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.title{font-family:'Geist',sans-serif;font-weight:700;font-size:24px;letter-spacing:-.6px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow)}
+.ig{display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line);gap:9px}
+.ig:last-child{border-bottom:none}
+.ig .nm{flex:1;font-size:14px;font-weight:500;min-width:0;background:none;border:none;text-align:left;padding:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ig .grwrap{display:flex;align-items:center;gap:4px;background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:3px 8px}
+.ig .grwrap input{width:44px;border:none;background:none;text-align:right;font-weight:500;font-size:13.5px;-moz-appearance:textfield}
+.ig .grwrap input::-webkit-outer-spin-button,.ig .grwrap input::-webkit-inner-spin-button{-webkit-appearance:none}
+.ig .grwrap span{font-size:12px;color:var(--muted)}
+.ig .kc{font-family:'Geist',sans-serif;font-weight:600;font-size:14px;min-width:48px;text-align:right}
+.ig .kc small{display:block;font-family:'Geist',sans-serif;font-weight:400;font-size:10px;color:var(--muted)}
+.ig .del{width:26px;height:26px;min-width:26px;border-radius:8px;border:none;background:transparent;color:var(--faint);font-size:15px}
+.addrow{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;color:var(--accent-2);font-weight:600;font-size:14px;background:var(--accent-soft);border:none;width:100%}
+.sumbar{display:flex;gap:7px;margin-top:12px}
+.chip{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 4px;text-align:center}
+.chip .v{font-family:'Geist',sans-serif;font-weight:700;font-size:15px}
+.chip .l{font-size:10px;color:var(--muted);margin-top:1px}
+.search{width:100%;border:1px solid var(--line);border-radius:14px;padding:11px 14px;background:var(--card);margin-bottom:10px;font-size:14px}
+.search::placeholder{color:var(--muted)}
+.libadd{font-size:12.5px;font-weight:600;color:var(--accent-2);background:var(--accent-soft);border:none;border-radius:9px;padding:6px 12px;white-space:nowrap;transition:background .15s,color .15s}
+.libadd.added{background:var(--accent);color:var(--accent-ink)}
+.libmeta{font-size:11px;color:var(--muted);margin-top:1px}
+
+/* ---------- Kauppalista ---------- */
+.shoptotal{background:var(--accent);border-radius:20px;padding:18px;color:var(--accent-ink);display:flex;justify-content:space-between;align-items:center}
+.st-sum{font-family:'Geist',sans-serif;font-weight:700;font-size:29px;letter-spacing:-.5px}
+.st-l{font-size:12px;opacity:.85;margin-top:2px}
+.st-r{text-align:right;font-size:12px;opacity:.9;line-height:1.5}
+.sitem{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.sitem.done{opacity:.45}
+.sitem.done .snm{text-decoration:line-through}
+.chk{width:25px;height:25px;min-width:25px;border-radius:8px;border:2px solid var(--off);display:flex;align-items:center;justify-content:center;font-size:13px;color:transparent;background:none}
+.sitem.done .chk{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.sinfo{flex:1;min-width:0;background:none;border:none;text-align:left;padding:0}
+.snm{font-size:13.5px;font-weight:600}
+.sdt{font-size:11px;color:var(--muted);margin-top:1px}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:30px;height:30px;border-radius:10px;border:1px solid var(--line);background:var(--soft2);font-weight:500;font-size:16px;color:var(--ink);line-height:1}
+.step .q{min-width:18px;text-align:center;font-family:'Geist',sans-serif;font-weight:600;font-size:14px}
+.spr{min-width:54px;text-align:right;font-family:'Geist',sans-serif;font-weight:600;font-size:13px;color:var(--eur)}
+.spr.zero{color:var(--muted);opacity:.55}
+.linkbtn{display:block;margin:14px auto 0;background:none;border:none;color:var(--muted);font-size:13px;font-weight:500;text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- Kuvat ---------- */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.pcell{border:none;background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);padding:0;position:relative;aspect-ratio:3/4}
+.pcell img{width:100%;height:100%;object-fit:cover;display:block}
+.pcell .pdate{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(15,25,20,.75));color:#fff;font-size:10.5px;font-weight:600;padding:14px 8px 7px;text-align:left}
+.pcell .pbadge{position:absolute;top:7px;right:7px;background:var(--accent);color:var(--accent-ink);font-size:10px;font-weight:700;border-radius:99px;padding:2px 7px}
+.photo-img{width:100%;border-radius:18px;box-shadow:var(--shadow);display:block;margin-bottom:12px}
+.ocrbtn{width:100%;padding:14px;border-radius:14px;border:none;background:var(--accent);color:var(--accent-ink);font-family:'Geist',sans-serif;font-weight:700;font-size:15px}
+.ocrbtn:disabled{opacity:.7}
+.ocrbar{height:6px;border-radius:99px;background:var(--track);overflow:hidden;margin-top:8px;display:none}
+.ocrbar.show{display:block}
+.ocrbar div{height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width .2s}
+.ocrhint{font-size:11.5px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.45}
+.prow{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:none}
+.prow input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent)}
+.prow .pnm{flex:1;border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:13px;min-width:0;background:var(--field)}
+.prow .ppr{width:70px;border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:13px;text-align:right;background:var(--field)}
+.prow .pmatch{font-size:10px;color:var(--accent-2);font-weight:600;white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis}
+.prow .pmatch.new{color:var(--muted)}
+
+/* ---------- Modaalit ---------- */
+.overlay{position:fixed;inset:0;background:rgba(20,28,23,.45);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.overlay.show{display:flex}
+.sheet{background:var(--card);border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));width:100%;max-width:560px;max-height:88vh;overflow-y:auto}
+.sheet h3{font-family:'Geist',sans-serif;font-weight:700;font-size:18px;margin-bottom:16px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.field input{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:var(--field)}
+.field select{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:var(--field);appearance:none;-webkit-appearance:none}
+.field input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.emojirow{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:4px}
+.emoji-opt{width:42px;height:42px;border-radius:13px;border:1.5px solid var(--line);background:var(--field);display:flex;align-items:center;justify-content:center;color:var(--ink);padding:0}
+.emoji-opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.btnrow{display:flex;gap:10px;margin-top:18px}
+.btn{flex:1;padding:13px;border-radius:14px;border:none;font-family:'Geist',sans-serif;font-weight:600;font-size:15px}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:var(--soft);color:var(--ink)}
+.btn.danger{background:none;color:var(--danger);font-size:13.5px;margin-top:12px;width:100%;padding:8px}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:4px}
+
+.note{font-size:12px;color:var(--muted);text-align:center;margin-top:20px;line-height:1.5}
+
+/* ---------- Päivänavigaatio ---------- */
+.datenav{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:14px}
+.datenav button{width:34px;height:34px;border-radius:11px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:16px;line-height:1}
+.datenav button:disabled{opacity:.35}
+.datenav .dlabel{font-family:'Geist',sans-serif;font-weight:600;font-size:15px;min-width:150px;text-align:center}
+.datenav .dlabel small{display:block;font-family:'Geist',sans-serif;font-weight:400;font-size:11px;color:var(--muted)}
+
+/* kirjausrivin poisto */
+.logdel{width:30px;height:30px;min-width:30px;border-radius:10px;border:1px solid var(--line);background:var(--soft2);color:#C4948C;font-size:15px}
+
+/* generaattorin ateriavalinta */
+.genrow{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.genrow:last-of-type{border-bottom:none}
+.genrow .gnm{flex:1;font-size:14px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.genrow .gnm small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
+.genrow .gstep{display:flex;align-items:center;gap:6px}
+.genrow .gstep button{width:28px;height:28px;border-radius:9px;border:1px solid var(--line);background:var(--soft2);font-size:15px;color:var(--ink);line-height:1}
+.genrow .gstep .gq{min-width:18px;text-align:center;font-family:'Geist',sans-serif;font-weight:600;font-size:14px}
+/* ---------- Viivakoodiskanneri ---------- */
+.scanner{position:fixed;inset:0;background:#000;z-index:40;display:none;flex-direction:column}
+.scanner.show{display:flex}
+.scanner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.scan-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:74%;max-width:330px;aspect-ratio:3/2;border:2px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 0 0 9999px rgba(0,0,0,.45)}
+.scan-line{position:absolute;left:8%;right:8%;top:50%;height:2px;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:scanmove 2s ease-in-out infinite}
+@keyframes scanmove{0%,100%{top:18%}50%{top:82%}}
+.scan-top{position:absolute;top:0;left:0;right:0;padding:calc(14px + env(safe-area-inset-top)) 16px 14px;display:flex;justify-content:space-between;align-items:center;z-index:2}
+.scan-top button{background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:12px;padding:8px 14px;font-size:14px;font-weight:600;backdrop-filter:blur(4px)}
+.scan-hint{position:absolute;bottom:calc(40px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;color:#fff;font-size:14px;font-weight:500;text-shadow:0 1px 4px rgba(0,0,0,.7);z-index:2;padding:0 24px;line-height:1.4}
+.scan-status{position:absolute;bottom:calc(96px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;padding:8px 16px;border-radius:99px;font-size:13px;font-weight:600;z-index:2;display:none}
+.scan-status.show{display:block}
+/* ---------- Profiili ---------- */
+.phead{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:18px;box-shadow:var(--shadow)}
+.pavatar{width:56px;height:56px;min-width:56px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Geist',sans-serif;font-weight:700;font-size:24px}
+.pmeta{flex:1;min-width:0}
+.pname{font-family:'Geist',sans-serif;font-weight:700;font-size:19px;border:none;background:none;width:100%;padding:0;color:var(--ink)}
+.pname:focus{outline:none;border-bottom:1px solid var(--accent)}
+.psub{font-size:12.5px;color:var(--muted);margin-top:3px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.pf select{width:100%;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:var(--field);font-size:15px;appearance:none;-webkit-appearance:none}
+.prow{display:flex;gap:10px;margin-bottom:12px}
+.pf{flex:1}
+.pf label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.pf input{width:100%;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:var(--field);font-size:15px;font-weight:500}
+.seg{display:flex;background:var(--soft);border-radius:11px;padding:3px;gap:3px}
+.seg button{flex:1;text-align:center;font-size:13px;font-weight:600;padding:9px 4px;border-radius:9px;color:var(--muted);border:none;background:none;font-family:inherit}
+.seg button.on{background:var(--card);color:var(--accent-2);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.calc{background:var(--accent);border-radius:18px;padding:18px;color:var(--accent-ink)}
+.calc .clbl{font-size:12px;opacity:.85}
+.calc .cbig{font-family:'Geist',sans-serif;font-weight:700;font-size:32px;letter-spacing:-.5px;margin-top:2px}
+.calc .cmac{display:flex;gap:8px;margin-top:14px}
+.calc .cmc{flex:1;background:rgba(0,0,0,.10);border-radius:12px;padding:9px;text-align:center}
+.calc .cmc .v{font-family:'Geist',sans-serif;font-weight:700;font-size:16px}
+.calc .cmc .l{font-size:10px;opacity:.85;margin-top:1px}
+.prange{width:100%;margin:12px 0 4px;accent-color:var(--accent)}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.toggle .tt{font-size:14px;font-weight:600}
+.toggle .ts{font-size:11.5px;color:var(--muted);margin-top:2px}
+.sw{width:46px;height:27px;min-width:46px;border-radius:99px;background:var(--off);position:relative;border:none;transition:background .2s}
+.sw.on{background:var(--accent)}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:21px;height:21px;background:#fff;border-radius:50%;transition:left .2s}
+.sw.on::after{left:22px}
+.plist .pli{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);width:100%;background:none;border-left:none;border-right:none;border-top:none;text-align:left}
+.plist .pli:last-child{border-bottom:none}
+.plist .pli .pic{width:34px;height:34px;min-width:34px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:16px}
+.plist .pli .pic svg{width:18px;height:18px;display:block}
+.plist .pli .plt{flex:1}
+.plist .pli .plt .pl1{font-size:14px;font-weight:500}
+.plist .pli .plt .pl2{font-size:11px;color:var(--muted);margin-top:1px}
+.plist .pli .pchev{color:var(--faint);font-size:18px}
+.plist .pli.danger .pl1{color:var(--danger)}
+.plist .pli.danger .pic{background:var(--danger-soft);color:var(--danger)}
+.pstatus{font-size:12.5px;font-weight:600;color:var(--accent);text-align:center;margin-top:10px;min-height:16px}
+/* ---------- Kauppalistan yhteenveto & ryhmät ---------- */
+.sumcard{display:flex;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+.sumcard .half{flex:1;padding:15px 16px}
+.sumcard .half + .half{border-left:1px solid var(--line)}
+.sumcard .slbl{font-size:10.5px;font-weight:600;letter-spacing:.4px;color:var(--muted);text-transform:uppercase}
+.sumcard .sbig{font-family:'Geist',sans-serif;font-weight:700;font-size:25px;letter-spacing:-.5px;margin-top:5px}
+.sumcard .sbig.eur{color:var(--eur)}
+.sumcard .ssub{font-size:11.5px;color:var(--muted);margin-top:3px}
+.sumcard .sbar{height:7px;border-radius:99px;background:var(--track);overflow:hidden;margin-top:9px}
+.sumcard .sbar>div{height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+.secthead{font-family:'Geist',sans-serif;font-weight:600;font-size:13px;color:var(--muted);margin:18px 2px 10px;display:flex;justify-content:space-between;align-items:baseline}
+.secthead .scnt{font-size:11.5px;color:var(--muted);font-weight:500;font-family:'Geist',sans-serif}
+.smeals{font-size:10.5px;color:var(--accent);margin-top:2px}
+.target.tappable{cursor:pointer}
+.t-more{text-align:right;font-size:12px;font-weight:600;color:var(--accent);margin-top:12px}
+/* Päivän ravintoarvot */
+.nutsum{display:flex;gap:8px;margin-bottom:18px}
+.nutsum .ns{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
+.nutsum .ns .v{font-family:'Geist',sans-serif;font-weight:700;font-size:18px}
+.nutsum .ns .l{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.3px}
+.nutgroup{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:4px 16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.nutrow{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+.nutrow:last-child{border-bottom:none}
+.nutrow .nl{color:var(--ink)}
+.nutrow .nv{font-family:'Geist',sans-serif;font-weight:600;font-variant-numeric:tabular-nums}
+.nutrow .nv.empty{color:var(--faint);font-weight:400}
+.nutnote{font-size:12px;color:var(--muted);padding:10px 2px;line-height:1.5}
+/* Modaalin tarkemmat ravintoarvot -osio */
+.extsec{margin-bottom:18px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.extsec summary{padding:12px 14px;font-size:14px;font-weight:600;cursor:pointer;list-style:none;background:var(--soft2)}
+.extsec summary::-webkit-details-marker{display:none}
+.extsec summary::after{content:"＋";float:right;color:var(--muted)}
+.extsec[open] summary::after{content:"−"}
+.extsec .extbody{padding:12px 14px}
+.extsub{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin:10px 0 6px}
+.extgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.extgrid input{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--field);font-size:14px;width:100%}
+/* SVG-kuvakkeet */
+.m-ic svg{width:23px;height:23px;display:block;color:var(--accent)}
+.emoji-opt svg{width:23px;height:23px;display:block}
+.emoji-opt.sel{color:var(--accent)}
+.iconbtn svg{width:19px;height:19px;display:block}
+.pavatar svg{width:30px;height:30px;display:block;color:var(--accent)}
+.bi{width:1.1em;height:1.1em;vertical-align:-.18em;margin-right:.35em;flex:none}
+/* Kirjaa-paneelin rivit (pikakirjaus) */
+.logrow{display:flex;align-items:center;gap:9px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.logrow:last-child{border-bottom:none}
+.logrow .m-ic{width:38px;height:38px;min-width:38px}
+.logrow .lr-info{flex:1;min-width:0;display:flex;flex-direction:column}
+.logrow .lr-nm{font-family:'Geist',sans-serif;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logrow .lr-sub{font-size:11px;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logrow .gstep{display:flex;align-items:center;gap:4px}
+.logrow .gstep button{width:27px;height:27px;border-radius:8px;border:1px solid var(--line);background:var(--soft2);font-size:15px;color:var(--ink);line-height:1}
+.logrow .gstep .gq{min-width:24px;text-align:center;font-family:'Geist',sans-serif;font-weight:600;font-size:13px}
+.logrow .grwrap{display:flex;align-items:center;gap:3px;background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:3px 7px}
+.logrow .grwrap input{width:40px;border:none;background:none;text-align:right;font-weight:500;font-size:13px;-moz-appearance:textfield;color:var(--ink)}
+.logrow .grwrap input::-webkit-outer-spin-button,.logrow .grwrap input::-webkit-inner-spin-button{-webkit-appearance:none}
+.logrow .grwrap span{font-size:11px;color:var(--muted)}
+.logrow .libadd{flex:none}
+.m-name .lr-mult{color:var(--muted);font-weight:500;font-size:13px}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(8px);background:var(--ink);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:99px;box-shadow:0 10px 28px -10px rgba(0,0,0,.45);z-index:30;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* Vesimittari */
+.w-top{display:flex;align-items:center;gap:10px}
+.w-ic{width:34px;height:34px;min-width:34px;border-radius:11px;background:var(--water-soft);display:flex;align-items:center;justify-content:center}
+.w-ic svg{width:19px;height:19px;color:var(--water)}
+.w-amt{font-size:14px}.w-amt b{font-family:'Geist',sans-serif;font-weight:700;font-size:18px}.w-amt span{color:var(--muted)}
+.w-pct{margin-left:auto;font-size:12px;font-weight:600;color:var(--water)}
+.w-btns{display:flex;gap:8px;margin-top:12px}
+.w-btns button{flex:1;padding:10px;border-radius:11px;border:1px solid var(--line);background:var(--soft2);font-family:'Geist',sans-serif;font-weight:600;font-size:13.5px;color:var(--ink)}
+.w-btns button.minus{flex:.55;color:var(--muted)}
+/* Edistyminen */
+.prog-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.prog-big{font-family:'Geist',sans-serif;font-weight:700;font-size:30px;letter-spacing:-1px}
+.prog-unit{font-size:14px;color:var(--muted)}
+.prog-delta{margin-left:auto;font-size:12px;font-weight:600;color:var(--muted);background:var(--soft);padding:4px 10px;border-radius:99px}
+.prog-delta.good{color:var(--accent-2);background:var(--accent-soft)}
+.prog-sub{font-size:12px;color:var(--muted);margin-bottom:10px}
+.prog-avgrow{display:flex;gap:10px;margin-bottom:2px}
+.prog-avg{flex:1}
+.prog-avg.right{text-align:right}
+.prog-avg .v{font-family:'Geist',sans-serif;font-weight:700;font-size:22px}
+.prog-avg .l{font-size:11px;color:var(--muted);margin-top:1px}
+.prog-legend{font-size:11px;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:6px}
+.prog-legend .dash{display:inline-block;width:16px;border-top:2px dashed currentColor;height:0;opacity:.7}
+.prog-chart{display:block;width:100%;margin-top:6px}
+/* Proteiini per euro */
+.pv-row{display:flex;align-items:center;gap:11px;padding:12px 14px;border-bottom:1px solid var(--line);width:100%;background:none;border-left:none;border-right:none;border-top:none;text-align:left}
+.pv-row:last-child{border-bottom:none}
+.pv-rank{width:26px;height:26px;min-width:26px;border-radius:8px;background:var(--soft);color:var(--muted);display:flex;align-items:center;justify-content:center;font-family:'Geist',sans-serif;font-weight:700;font-size:13px}
+.pv-rank.top{background:var(--accent-soft);color:var(--accent-2)}
+.pv-info{flex:1;min-width:0;display:flex;flex-direction:column}
+.pv-nm{font-family:'Geist',sans-serif;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pv-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.pv-bar{height:5px;border-radius:99px;background:var(--track);margin-top:6px;overflow:hidden}
+.pv-bar>span{display:block;height:100%;background:var(--p);border-radius:99px}
+.pv-val{text-align:right;min-width:46px}
+.pv-val b{font-family:'Geist',sans-serif;font-weight:700;font-size:17px;color:var(--p)}
+.pv-val small{display:block;font-size:10px;color:var(--muted)}
+/* Varmuuskopiomuistutus */
+.bkbanner{background:var(--warn-bg);border:1px solid var(--line);border-radius:16px;padding:13px 14px;margin-bottom:16px}
+.bk-row{display:flex;align-items:flex-start;gap:10px}
+.bk-ic{display:flex;align-items:center}
+.bk-ic svg{width:21px;height:21px;color:var(--warn-ink)}
+.bk-txt{flex:1}
+.bk-txt b{display:block;font-family:'Geist',sans-serif;font-weight:600;font-size:13.5px;color:var(--warn-ink)}
+.bk-txt span{font-size:11.5px;color:var(--warn-ink);opacity:.85}
+.bk-x{width:24px;height:24px;min-width:24px;border:none;background:none;color:var(--warn-ink);opacity:.55;font-size:14px}
+.bk-btn{width:100%;margin-top:10px;padding:9px;border-radius:10px;border:none;background:var(--accent);color:var(--accent-ink);font-family:'Geist',sans-serif;font-weight:700;font-size:13.5px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ======== TÄNÄÄN ======== -->
+  <div class="page active" id="page-today">
+    <div id="today-backup"></div>
+    <div id="today-header"></div>
+    <div id="today-ring"></div>
+    <div id="today-water"></div>
+    <div id="today-steps"></div>
+    <div class="h2">Päivän ateriat</div>
+    <div id="today-meals"></div>
+    <div id="today-copy"></div>
+  </div>
+
+  <!-- ======== ATERIAT ======== -->
+  <div class="page" id="page-meals">
+    <h1 class="bigtitle pagetitle">Ateriat</h1>
+    <div id="meals-list"></div>
+  </div>
+
+  <!-- ======== ATERIAN MUOKKAUS ======== -->
+  <div class="page" id="page-detail">
+    <div class="backrow">
+      <button class="iconbtn" onclick="closeDetail()" aria-label="Takaisin">←</button>
+      <div class="title" id="d-title"></div>
+      <button class="iconbtn" onclick="openMealModal(currentMeal)" aria-label="Muokkaa ateriaa">✎</button>
+    </div>
+    <div class="panel" id="d-ings"></div>
+    <div class="sumbar" id="d-sum"></div>
+    <div class="h2">Ruoka-ainekirjasto</div>
+    <input class="search" id="d-search" placeholder="Hae ruoka-ainetta…" oninput="renderLibrary()">
+    <div class="panel" id="d-lib"></div>
+    <div class="note">Napauta ruoka-aineen nimeä muokataksesi sen tietoja</div>
+  </div>
+
+  <!-- ======== KAUPPALISTA ======== -->
+  <div class="page" id="page-shop">
+    <h1 class="bigtitle pagetitle">Kauppalista</h1>
+    <div id="shop-total"></div>
+    <div id="shop-list"></div>
+  </div>
+
+  <!-- ======== KUVAT ======== -->
+  <div class="page" id="page-photos">
+    <h1 class="bigtitle pagetitle">Kuvat</h1>
+    <div id="photo-grid"></div>
+    <div class="note">Kuvaa kuitti tai hyllyn hintalappu — kuva tallentuu vain tälle laitteelle.<br>Kuiteista sovellus osaa lukea tuotteet ja hinnat automaattisesti.</div>
+  </div>
+
+  <!-- ======== KUVAN TARKASTELU ======== -->
+  <div class="page" id="page-photoview">
+    <div class="backrow">
+      <button class="iconbtn" onclick="closePhoto()" aria-label="Takaisin">←</button>
+      <div class="title" id="pv-title"></div>
+      <button class="iconbtn" onclick="deletePhoto()" aria-label="Poista kuva"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16M9 6.5V4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6.5 6.5l1 13a1.5 1.5 0 0 0 1.5 1.4h6a1.5 1.5 0 0 0 1.5-1.4l1-13M10 11v6M14 11v6"/></svg></button>
+    </div>
+    <img class="photo-img" id="pv-img" alt="Tallennettu kuva">
+    <div class="field">
+      <input id="pv-note" placeholder="Muistiinpano, esim. Lidl Pitkämäki…" maxlength="60" onchange="savePhotoNote(this.value)">
+    </div>
+    <button class="ocrbtn" id="pv-ocr" onclick="startOCR()"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.2"/><path d="M20 20l-3.8-3.8"/></svg> Lue tuotteet ja hinnat</button>
+    <div class="ocrbar" id="pv-bar"><div id="pv-barfill"></div></div>
+    <div class="ocrhint" id="pv-hint">Tekstintunnistus toimii parhaiten suorassa, hyvin valaistussa kuitissa.<br>Ensimmäinen luku lataa tunnistuskirjaston verkosta (~15 Mt).</div>
+    <div id="pv-results"></div>
+  </div>
+
+  <!-- ======== PROFIILI ======== -->
+  <div class="page" id="page-profile">
+    <h1 class="bigtitle pagetitle">Profiili</h1>
+    <div id="profile-body"></div>
+  </div>
+
+  <!-- ======== PÄIVÄN RAVINTOARVOT ======== -->
+  <div class="page" id="page-daydetail">
+    <div class="backrow">
+      <button class="iconbtn" onclick="closeDayDetail()" aria-label="Takaisin">←</button>
+      <div class="title">Ravintoarvot</div>
+    </div>
+    <div id="daydetail-body"></div>
+  </div>
+
+  <!-- ======== EDISTYMINEN ======== -->
+  <div class="page" id="page-progress">
+    <div class="backrow">
+      <button class="iconbtn" onclick="closeProgress()" aria-label="Takaisin">←</button>
+      <div class="title">Edistyminen</div>
+    </div>
+    <div id="progress-body"></div>
+  </div>
+
+  <!-- ======== EDULLISIN PROTEIINI ======== -->
+  <div class="page" id="page-protein">
+    <div class="backrow">
+      <button class="iconbtn" onclick="closeProteinValue()" aria-label="Takaisin">←</button>
+      <div class="title">Edullisin proteiini</div>
+    </div>
+    <div id="protein-body"></div>
+  </div>
+
+</div>
+
+<input type="file" id="cam" accept="image/*" capture="environment" hidden>
+<input type="file" id="gal" accept="image/*" multiple hidden>
+<input type="file" id="backup-file" accept="application/json,.json" hidden>
+
+<div class="scanner" id="scanner" aria-hidden="true">
+  <video id="scan-video" playsinline autoplay muted></video>
+  <div class="scan-frame"><div class="scan-line"></div></div>
+  <div class="scan-top">
+    <button onclick="stopScanner()">✕ Sulje</button>
+    <button onclick="manualBarcode()"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2.2"/><path d="M6 9.5h.01M9.5 9.5h.01M13 9.5h.01M16.5 9.5h.01M6 13h.01M16.5 13h.01M9 16h6"/></svg> Syötä koodi</button>
+  </div>
+  <div class="scan-status" id="scan-status"></div>
+  <div class="scan-hint">Kohdista tuotteen viivakoodi kehyksen sisään</div>
+</div>
+
+<button class="fab show" id="fab" onclick="fabAction()">＋ Kirjaa</button>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<nav class="nav">
+  <button class="nv on" data-tab="today" onclick="showTab('today')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M8.5 14.5l2.2 2.2 4.3-4.6"/></svg></span>Tänään<span class="dot"></span></button>
+  <button class="nv" data-tab="meals" onclick="showTab('meals')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11h17a8.5 8.5 0 0 1-8.5 8.5A8.5 8.5 0 0 1 3.5 11z"/><path d="M8 4.5V7.3M12 3.5V7.3M16 4.5V7.3"/></svg></span>Ateriat<span class="dot"></span></button>
+  <button class="nv" data-tab="shop" onclick="showTab('shop')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2.2l2.3 11.2a1.6 1.6 0 0 0 1.6 1.3h8.7a1.6 1.6 0 0 0 1.55-1.2L21 6.5H6"/></svg></span>Kauppa<span class="dot"></span></button>
+  <button class="nv" data-tab="photos" onclick="showTab('photos')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5h-5L7.2 7.2H4a2 2 0 0 0-2 2v8.3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9.2a2 2 0 0 0-2-2h-3.2z"/><circle cx="12" cy="13" r="3.3"/></svg></span>Kuvat<span class="dot"></span></button>
+  <button class="nv" data-tab="profile" onclick="showTab('profile')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 20.5a7 7 0 0 1 14 0"/></svg></span>Profiili<span class="dot"></span></button>
+</nav>
+
+<!-- ======== MODAALIT ======== -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+// ============ TILA & TALLENNUS ============
+const KEY = "makrolista_v1";
+
+// ============ KUVAKKEET (yhtenäiset SVG-viivakuvakkeet) ============
+const _I = b => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${b}</svg>`;
+const ICONS = {
+  // aterioiden kuvakkeet
+  meal:_I(`<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v9"/><path d="M16.5 3c-1.6 0-2.5 2.2-2.5 5.2s.9 4 2.5 4M16.5 12.4V20"/>`),
+  bowl:_I(`<path d="M3.5 11.5h17a8.4 8.4 0 0 1-8.5 7.8 8.4 8.4 0 0 1-8.5-7.8z"/><path d="M9 4.6c0 1.6 1 1.8 1 3.2M13 3.9c0 1.8 1 2 1 3.6"/>`),
+  cup:_I(`<path d="M5 8.5h11v5.5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M16 10h2.3a1.9 1.9 0 0 1 0 3.8H16"/><path d="M8 4.3c0 1-.8 1.2-.8 2.1M11.5 4.1c0 1-.8 1.2-.8 2.1"/>`),
+  salad:_I(`<path d="M4 13.2h16a8 8 0 0 1-16 0z"/><path d="M12.8 12.8c-3.2.2-5.8-2.3-6.1-5.7 3.4-.2 6 2.3 6.1 5.7z"/><path d="M7.2 7.6c1.9 1.5 3.7 3.1 4.9 5"/><path d="M12.8 12.8c.7-2 2.6-3.2 5-3.4"/>`),
+  apple:_I(`<path d="M12 7.6c-1.5-2-5.1-1.7-6.1.8-1.2 3 .8 8.1 3 9.1 1 .4 1.9-.3 3.1-.3s2.1.7 3.1.3c2.2-1 4.2-6.1 3-9.1-1-2.5-4.5-2.8-6-.8z"/><path d="M12 7.6V5.4c0-1.2 1-2.1 2.3-2.1"/>`),
+  banana:_I(`<path d="M5.8 5.6c.4 5.9 4.3 10.4 10.8 11.7 1.7.4 2.7-.8 2-2-.3-.6-1.1-.6-2.1-.9C10.5 12.9 7.9 9.4 7.7 5.6c0-.6-.4-1-1-1s-1 .4-.9 1z"/><path d="M5.8 5.6c-.2-.8-.1-1.5.5-2"/><path d="M16.6 17.3c1.1.2 2 0 2.4-.6"/>`),
+  egg:_I(`<path d="M12 3.4c-3.7 0-6.6 5.1-6.6 9.4a6.6 6.6 0 0 0 13.2 0c0-4.3-2.9-9.4-6.6-9.4z"/>`),
+  sandwich:_I(`<path d="M4.5 16.4l7.5-11 7.5 11z"/><path d="M6.7 13.1c1.1-.9 1.9-.9 3 0s1.9.9 3 0 1.9-.9 3 0"/>`),
+  bread:_I(`<path d="M3.6 13.8c0-3.4 3.8-6 8.4-6s8.4 2.6 8.4 6c0 1.2-.9 2-2.1 2H5.7c-1.2 0-2.1-.8-2.1-2z"/><path d="M8.2 11.2l-1 2.2M12 10.7l-1 2.3M15.8 11.2l-1 2.2"/>`),
+  dumbbell:_I(`<path d="M3.5 9v6M5.9 7.5v9M18.1 7.5v9M20.5 9v6M5.9 12h12.2"/>`),
+  moon:_I(`<path d="M20.5 13.6A8.2 8.2 0 1 1 10.4 3.5 6.4 6.4 0 0 0 20.5 13.6z"/>`),
+  target:_I(`<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.8"/><circle cx="12" cy="12" r="1.4"/>`),
+  item:_I(`<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.3"/>`),
+  copy:_I(`<rect x="8.5" y="8.5" width="11" height="11" rx="2.2"/><path d="M5.5 15.5h-1A1.5 1.5 0 0 1 3 14V4.5A1.5 1.5 0 0 1 4.5 3H14a1.5 1.5 0 0 1 1.5 1.5v1"/>`),
+  drop:_I(`<path d="M12 3.2c3.6 4.3 6.1 7.5 6.1 10.8a6.1 6.1 0 0 1-12.2 0c0-3.3 2.5-6.5 6.1-10.8z"/>`),
+  chart:_I(`<path d="M4 4v15.5a.5.5 0 0 0 .5.5H20"/><path d="M7.5 15l3.3-3.8 3 2.4L19 7.5"/>`),
+  euro:_I(`<circle cx="12" cy="12" r="8.5"/><path d="M15 8.9a3.8 3.8 0 1 0 0 6.2"/><path d="M7.8 11h5.4M7.8 13.2h4.8"/>`),
+  shield:_I(`<path d="M12 3l7 2.8v5.4c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V5.8z"/><path d="M9 11.8l2 2 4-4.2"/>`),
+  // hyötykuvakkeet
+  camera:_I(`<path d="M14.5 4.5h-5L7.2 7.2H4a2 2 0 0 0-2 2v8.3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9.2a2 2 0 0 0-2-2h-3.2z"/><circle cx="12" cy="13" r="3.3"/>`),
+  search:_I(`<circle cx="11" cy="11" r="6.2"/><path d="M20 20l-3.8-3.8"/>`),
+  image:_I(`<rect x="3" y="4.5" width="18" height="15" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 16l-5-5L4 19.5"/>`),
+  cart:_I(`<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2.2l2.3 11.2a1.6 1.6 0 0 0 1.6 1.3h8.7a1.6 1.6 0 0 0 1.55-1.2L21 6.5H6"/>`),
+  sparkles:_I(`<path d="M12 3.2l1.7 4.9 4.9 1.7-4.9 1.7L12 16.4l-1.7-4.9L5.4 9.8l4.9-1.7z"/><path d="M18.5 14.5l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7z"/>`),
+  trash:_I(`<path d="M4 6.5h16M9 6.5V4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6.5 6.5l1 13a1.5 1.5 0 0 0 1.5 1.4h6a1.5 1.5 0 0 0 1.5-1.4l1-13M10 11v6M14 11v6"/>`),
+  keyboard:_I(`<rect x="2.5" y="6" width="19" height="12" rx="2.2"/><path d="M6 9.5h.01M9.5 9.5h.01M13 9.5h.01M16.5 9.5h.01M6 13h.01M16.5 13h.01M9 16h6"/>`),
+  person:_I(`<circle cx="12" cy="8" r="4"/><path d="M5 20.5a7 7 0 0 1 14 0"/>`),
+  check:_I(`<circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.2l2.4 2.4 4.6-4.9"/>`),
+};
+const MEAL_ICONS = ["meal","bowl","cup","salad","apple","banana","egg","sandwich","bread","dumbbell","moon","target"];
+// Vanhojen emojien kartoitus uusiin kuvakeavaimiin (ettei tallennetut ateriat hajoa)
+const LEGACY_EMOJI = {"🍽️":"meal","🍽":"meal","🥤":"cup","🍛":"bowl","🥗":"salad","🍓":"apple","🌙":"moon","🥪":"sandwich","🍳":"egg","🍌":"banana","🎯":"target"};
+function normIcon(key){ if (ICONS[key]) return key; if (LEGACY_EMOJI[key]) return LEGACY_EMOJI[key]; return "meal"; }
+function mealIcon(key){ return ICONS[normIcon(key)]; }
+function ic(name){ return (ICONS[name] || "").replace("<svg ", '<svg class="bi" '); }
+
+// [nimi, kcal, P, H, R, €/100g, pakkaus_g, pakkaushinta, pakkausmerkintä, osasto]
+const seedFoods = [
+  ["Kaurahiutale", 370, 13, 58, 7, 0.12, 1000, 1.20, "1 kg pussi", "kuiva"],
+  ["Riisimuro", 380, 7, 85, 1, 0.51, 500, 2.55, "500 g paketti", "kuiva"],
+  ["Keitetty riisi", 130, 2.7, 28, 0.3, 0.09, 1000, 2.50, "1 kg pussi (kuiva)", "kuiva"],
+  ["Banaani", 89, 1.1, 23, 0.3, 0.16, 1000, 1.59, "n. 1 kg", "hedelmat"],
+  ["Omena", 52, 0.3, 11.5, 0.2, 0.15, 2000, 2.99, "2 kg pussi", "hedelmat"],
+  ["Mansikka (pakaste)", 32, 0.7, 7, 0.3, 0.47, 500, 2.35, "500 g pussi", "pakaste"],
+  ["Heraproteiini", 380, 75, 8, 5, 2.50, 1000, 25.00, "1 kg purkki", "kuiva"],
+  ["Maitorahka 0,2 %", 72, 12, 3.5, 1.5, 0.35, 250, 0.88, "250 g rasia", "maito"],
+  ["Skyr", 63, 11, 4, 0.2, 0.67, 400, 1.39, "400 g rasia", "maito"],
+  ["Vanilja skyr", 70, 11, 6, 0.3, 0.70, 400, 2.69, "400 g rasia", "maito"],
+  ["Rasvaton jogurtti", 40, 4, 5.5, 0.1, 0.14, 1000, 1.35, "1 kg purkki", "maito"],
+  ["Rasvaton raejuusto", 72, 13, 3, 0.5, 0.54, 400, 2.15, "400 g rasia", "maito"],
+  ["Kananmuna", 155, 13, 1.1, 11, 0.64, 600, 3.85, "10 kpl", "maito"],
+  ["Kananmunan valkuainen", 52, 11, 0.7, 0.2, 1.17, 0, 0, "", "maito"],
+  ["Kanajauheliha 5 %", 120, 19, 0, 5, 0.74, 400, 2.95, "400 g rasia", "liha"],
+  ["Vihreät pavut", 31, 2.5, 5.5, 0.1, 0.34, 450, 1.55, "450 g pussi", "pakaste"],
+  ["Oliiviöljy", 884, 0, 0, 100, 0.90, 500, 4.50, "500 ml pullo", "kuiva"],
+  ["Hunaja", 304, 0.3, 82, 0, 0.71, 350, 2.50, "350 g purkki", "kuiva"],
+  ["Cashewpähkinä", 570, 18, 33, 46, 1.00, 200, 2.00, "200 g pussi", "kuiva"],
+  ["Sokeriton ketsuppi", 10, 0.2, 2.5, 0, 0.29, 500, 1.45, "500 ml pullo", "kuiva"],
+];
+
+// Kaupan osastot (kulkujärjestyksessä)
+const SHOP_CATS = [
+  ["hedelmat", "Hedelmät & vihannekset"],
+  ["liha", "Liha & kala"],
+  ["maito", "Maitotuotteet & munat"],
+  ["pakaste", "Pakasteet"],
+  ["kuiva", "Kuivatuotteet"],
+  ["muut", "Muut"],
+];
+const CAT_LABEL = Object.fromEntries(SHOP_CATS);
+
+// Tarkemmat ravintoaineet (per 100 g). [avain, nimi, yksikkö, ryhmä, vakiomerkintä]
+const EXT_NUTRIENTS = [
+  ["sugar", "Sokeri", "g", "hiilari", true],
+  ["fiber", "Kuitu", "g", "hiilari", true],
+  ["satfat", "Tyydyttynyt rasva", "g", "rasva", true],
+  ["monofat", "Kertatyydyttymätön", "g", "rasva", false],
+  ["polyfat", "Monityydyttymätön", "g", "rasva", false],
+  ["salt", "Suola", "g", "muu", true],
+  ["water", "Vesi", "g", "muu", false],
+  ["vitA", "A-vitamiini", "µg", "vitamiini", false],
+  ["vitC", "C-vitamiini", "mg", "vitamiini", false],
+  ["vitD", "D-vitamiini", "µg", "vitamiini", false],
+  ["vitB12", "B12-vitamiini", "µg", "vitamiini", false],
+  ["folate", "Folaatti", "µg", "vitamiini", false],
+  ["calcium", "Kalsium", "mg", "kivennais", false],
+  ["iron", "Rauta", "mg", "kivennais", false],
+  ["potassium", "Kalium", "mg", "kivennais", false],
+  ["magnesium", "Magnesium", "mg", "kivennais", false],
+  ["zinc", "Sinkki", "mg", "kivennais", false],
+];
+const EXT_GROUPS = [["hiilari","Hiilihydraatit"],["rasva","Rasvat"],["muu","Muut"],["vitamiini","Vitamiinit"],["kivennais","Kivennäisaineet"]];
+
+// Likimääräiset arvot sisäänrakennetuille ruoille (per 100 g). Vitamiinit/kivennäiset vain merkittävissä.
+const seedExt = {
+  "Kaurahiutale":        { sugar:1, fiber:10, satfat:1.3, salt:0.01, iron:4.7, magnesium:177, zinc:4 },
+  "Riisimuro":           { sugar:8, fiber:1, satfat:0.2, salt:0.6, iron:8 },
+  "Keitetty riisi":      { sugar:0.1, fiber:0.4, satfat:0.1, salt:0.01 },
+  "Banaani":             { sugar:12, fiber:2.6, satfat:0.1, salt:0, potassium:358, vitC:8.7 },
+  "Omena":               { sugar:10, fiber:2.4, satfat:0, salt:0, potassium:107, vitC:4.6 },
+  "Mansikka (pakaste)":  { sugar:4.9, fiber:2, satfat:0, salt:0, vitC:59, potassium:153 },
+  "Heraproteiini":       { sugar:4, fiber:0, satfat:1, salt:0.5, calcium:500 },
+  "Maitorahka 0,2 %":    { sugar:3.5, fiber:0, satfat:1, salt:0.1, calcium:120 },
+  "Skyr":                { sugar:4, fiber:0, satfat:0.1, salt:0.1, calcium:150 },
+  "Vanilja skyr":        { sugar:6, fiber:0, satfat:0.2, salt:0.1, calcium:140 },
+  "Rasvaton jogurtti":   { sugar:4.5, fiber:0, satfat:0.1, salt:0.1, calcium:120 },
+  "Rasvaton raejuusto":  { sugar:3, fiber:0, satfat:0.3, salt:0.3, calcium:80 },
+  "Kananmuna":           { sugar:0.4, fiber:0, satfat:3.3, salt:0.3, vitD:2, vitB12:1.1, calcium:56, iron:1.8 },
+  "Kananmunan valkuainen":{ sugar:0.7, fiber:0, satfat:0, salt:0.2 },
+  "Kanajauheliha 5 %":   { sugar:0, fiber:0, satfat:1.7, salt:0.2, zinc:1.5, iron:0.7 },
+  "Vihreät pavut":       { sugar:3, fiber:3.4, satfat:0, salt:0, vitC:12, potassium:211 },
+  "Oliiviöljy":          { sugar:0, fiber:0, satfat:14, monofat:73, polyfat:11, salt:0 },
+  "Hunaja":              { sugar:82, fiber:0.2, satfat:0, salt:0 },
+  "Cashewpähkinä":       { sugar:6, fiber:3.3, satfat:8, monofat:27, polyfat:8, salt:0.01, magnesium:292, iron:6.7, zinc:5.8 },
+  "Sokeriton ketsuppi":  { sugar:2.5, fiber:1, satfat:0, salt:2 },
+};
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function freshState(){
+  return {
+    targets: { kcal: 2500, p: 150, h: 300, r: 70 },
+    foods: seedFoods.map(f => ({ id: uid(), name: f[0], kcal: f[1], p: f[2], h: f[3], r: f[4], price: f[5],
+      pkg: (f[6] && f[7]) ? { grams: f[6], price: f[7], label: f[8] || (f[6] + " g") } : null, cat: f[9] || "muut",
+      ext: seedExt[f[0]] || {} })),
+    meals: [],
+    shop: [],
+    log: {},
+    water: {},
+    weights: {},
+    steps: {},
+    profile: { name:"", weight:80, height:175, age:30, sex:"male", activity:"moderate", goal:"maintain", proteinPerKg:2.0, useCalculated:false, startTab:"today", dark:false, defaultGrams:100, waterTarget:2500, stepGoal:10000, lastBackup:0, backupSnooze:0 },
+  };
+}
+
+let state;
+function load(){
+  try {
+    const raw = localStorage.getItem(KEY);
+    state = raw ? JSON.parse(raw) : freshState();
+    if (!state.targets || !state.foods) state = freshState();
+    if (!state.log) state.log = {};
+    if (!state.profile) state.profile = { name:"", weight:80, height:175, age:30, sex:"male", activity:"moderate", goal:"maintain", proteinPerKg:2.0, useCalculated:false, startTab:"today" };
+    if (state.profile.name === undefined) state.profile.name = "";
+    if (state.profile.startTab === undefined) state.profile.startTab = "today";
+    if (state.profile.dark === undefined) state.profile.dark = false;
+    if (state.profile.defaultGrams === undefined) state.profile.defaultGrams = 100;
+    if (state.profile.waterTarget === undefined) state.profile.waterTarget = 2500;
+    if (state.profile.stepGoal === undefined) state.profile.stepGoal = 10000;
+    if (!state.steps) state.steps = {};
+    if (state.profile.lastBackup === undefined) state.profile.lastBackup = 0;
+    if (state.profile.backupSnooze === undefined) state.profile.backupSnooze = 0;
+    if (!state.water) state.water = {};
+    if (!state.weights) state.weights = {};
+    // Lisää pakkaustiedot vanhoille ruoka-aineille (jotka tallennettiin ennen ominaisuutta)
+    const seedPkg = {}, seedCat = {};
+    for (const f of seedFoods){
+      if (f[6] && f[7]) seedPkg[f[0]] = { grams: f[6], price: f[7], label: f[8] || (f[6] + " g") };
+      seedCat[f[0]] = f[9] || "muut";
+    }
+    let migrated = false;
+    for (const f of state.foods){
+      if (f.pkg === undefined){ f.pkg = seedPkg[f.name] || null; migrated = true; }
+      if (f.cat === undefined){ f.cat = seedCat[f.name] || "muut"; migrated = true; }
+      if (f.ext === undefined){ f.ext = seedExt[f.name] || {}; migrated = true; }
+    }
+    for (const m of (state.meals || [])){
+      const k = normIcon(m.emoji);
+      if (m.emoji !== k){ m.emoji = k; migrated = true; }
+    }
+    if (migrated) save();
+  } catch(e){ state = freshState(); }
+}
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){}
+}
+
+// ============ INDEXEDDB (kuvat) ============
+let _db = null;
+function idb(){
+  return new Promise((res, rej) => {
+    if (_db) return res(_db);
+    const r = indexedDB.open("makrolista", 1);
+    r.onupgradeneeded = e => e.target.result.createObjectStore("photos", { keyPath: "id" });
+    r.onsuccess = e => { _db = e.target.result; res(_db); };
+    r.onerror = () => rej(r.error);
+  });
+}
+async function dbPut(obj){
+  const db = await idb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction("photos", "readwrite");
+    tx.objectStore("photos").put(obj);
+    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+  });
+}
+async function dbAll(){
+  const db = await idb();
+  return new Promise((res, rej) => {
+    const rq = db.transaction("photos").objectStore("photos").getAll();
+    rq.onsuccess = () => res(rq.result || []); rq.onerror = () => rej(rq.error);
+  });
+}
+async function dbGet(id){
+  const db = await idb();
+  return new Promise((res, rej) => {
+    const rq = db.transaction("photos").objectStore("photos").get(id);
+    rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error);
+  });
+}
+async function dbDel(id){
+  const db = await idb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction("photos", "readwrite");
+    tx.objectStore("photos").delete(id);
+    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+  });
+}
+
+// ============ APUFUNKTIOT ============
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function eur(x){ return x.toFixed(2).replace(".", ",") + " €"; }
+function r1(x){ return Math.round(x*10)/10; }
+function food(id){ return state.foods.find(f => f.id === id); }
+
+function mealTotals(m){
+  let kcal=0,p=0,h=0,r=0,pr=0;
+  for (const it of m.items){
+    const f = food(it.foodId); if (!f) continue;
+    const k = it.grams / 100;
+    kcal += f.kcal*k; p += f.p*k; h += f.h*k; r += f.r*k; pr += f.price*k;
+  }
+  return { kcal: Math.round(kcal), p: r1(p), h: r1(h), r: r1(r), pr };
+}
+
+// Yksittäisen kirjausrivin ravintoarvot. Tukee sekä ateriapohjaa (mealId + mult)
+// että suoraa ruoka-ainetta (foodId + grams). Palauttaa null jos viittaus puuttuu.
+function entryTotals(e){
+  if (e.foodId){
+    const f = food(e.foodId);
+    if (!f) return null;
+    const k = (e.grams || 0) / 100;
+    return { kcal: Math.round(f.kcal*k), p: r1(f.p*k), h: r1(f.h*k), r: r1(f.r*k), pr: f.price*k };
+  }
+  const m = state.meals.find(x => x.id === e.mealId);
+  if (!m) return null;
+  const mult = e.mult || 1;
+  const t = mealTotals(m);
+  return { kcal: Math.round(t.kcal*mult), p: r1(t.p*mult), h: r1(t.h*mult), r: r1(t.r*mult), pr: t.pr*mult };
+}
+function fmtMult(x){ return (Math.round(x*10)/10).toString().replace(".", ","); }
+// ---- Päivämäärä & kirjaus ----
+let viewDate = new Date();
+function dateKey(d){
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+function logFor(key){ return state.log[key] || []; }
+function waterFor(key){ return (state.water && state.water[key]) || 0; }
+function addWater(ml){
+  const key = dateKey(viewDate);
+  const nv = Math.max(0, waterFor(key) + ml);
+  if (nv === 0) delete state.water[key]; else state.water[key] = nv;
+  save(); renderToday();
+}
+function waterCardHTML(){
+  const key = dateKey(viewDate);
+  const ml = waterFor(key), target = state.profile.waterTarget || 2500;
+  const pct = target > 0 ? Math.min(100, Math.round(ml/target*100)) : 0;
+  const L = v => (v/1000).toFixed(1).replace(".", ",");
+  return `<div class="h2">Vesi</div>
+    <div class="card" style="display:block">
+      <div class="w-top">
+        <span class="w-ic">${ICONS.drop}</span>
+        <span class="w-amt"><b>${L(ml)} l</b> <span>/ ${L(target)} l</span></span>
+        <span class="w-pct">${pct} %</span>
+      </div>
+      <div class="track" style="margin-top:10px"><div class="fill" style="width:${pct}%;background:var(--water)"></div></div>
+      <div class="w-btns">
+        <button class="minus" onclick="addWater(-200)" aria-label="Vähennä 2 desilitraa">−</button>
+        <button onclick="addWater(200)">+ 2 dl</button>
+        <button onclick="addWater(500)">+ 5 dl</button>
+      </div>
+    </div>`;
+}
+
+// ---------- Askeleet ----------
+function stepsFor(key){ return (state.steps && state.steps[key]) || 0; }
+function stepsCardHTML(){
+  const key = dateKey(viewDate);
+  const s = stepsFor(key), goal = state.profile.stepGoal || 10000;
+  const pct = goal > 0 ? Math.min(100, Math.round(s/goal*100)) : 0;
+  const f = n => n.toLocaleString("fi-FI");
+  const footIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z"/><path d="M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z"/><path d="M16 17h4"/><path d="M4 13h4"/></svg>`;
+  return `<div class="h2">Askeleet</div>
+    <div class="card" style="display:block">
+      <div class="w-top">
+        <span class="w-ic" style="background:var(--accent-soft)"><span style="color:var(--accent-2);display:flex">${footIcon}</span></span>
+        <span class="w-amt"><b>${f(s)}</b> <span>/ ${f(goal)}</span></span>
+        <span class="w-pct" style="color:var(--accent-2)">${pct} %</span>
+      </div>
+      <div class="track" style="margin-top:10px"><div class="fill" style="width:${pct}%;background:var(--accent-2)"></div></div>
+      <div class="w-btns">
+        <button onclick="syncStepsShortcut()">Hae Fitnessistä</button>
+        <button onclick="openStepsModal()">Syötä</button>
+      </div>
+    </div>`;
+}
+function openStepsModal(){
+  const key = dateKey(viewDate);
+  sheet.innerHTML = `
+    <h3>Syötä askeleet</h3>
+    <div class="field"><label for="st-n">Askeleet</label>
+      <input id="st-n" inputmode="numeric" value="${stepsFor(key) || ''}" placeholder="esim. 8423"></div>
+    <button class="linkbtn" style="margin:2px 0 4px" onclick="pasteSteps()">Liitä leikepöydältä</button>
+    <div class="hint">Tallentuu valitun päivän askeliksi. Luvun näet iPhonen Fitness-sovelluksesta tai voit hakea sen "Hae Fitnessistä" -napilla.</div>
+    <div class="btnrow">
+      <button class="btn ghost" onclick="closeModal()">Peruuta</button>
+      <button class="btn primary" onclick="saveSteps()">Tallenna</button>
+    </div>`;
+  overlay.classList.add("show");
+  setTimeout(() => { const el = document.getElementById("st-n"); if (el) el.focus(); }, 100);
+}
+function saveSteps(){
+  const key = dateKey(viewDate);
+  const el = document.getElementById("st-n");
+  const n = Math.max(0, parseInt(String(el ? el.value : "").replace(/\D/g, "")) || 0);
+  if (n === 0) delete state.steps[key]; else state.steps[key] = n;
+  save(); closeModal(); renderToday();
+  toast("Askeleet tallennettu.");
+}
+async function pasteSteps(){
+  try {
+    const t = await navigator.clipboard.readText();
+    const n = parseInt(String(t).replace(/\D/g, "")) || 0;
+    const el = document.getElementById("st-n");
+    if (n > 0 && el){ el.value = n; }
+    else toast("Leikepöydältä ei löytynyt numeroa.");
+  } catch(e){ toast("Leikepöydän luku ei onnistunut."); }
+}
+function syncStepsShortcut(){
+  // Avaa Pikakomennon, joka lukee Terveydestä päivän askeleet ja palauttaa ne
+  // sovellukseen avaamalla sen URL:lla #steps=NNNN.
+  location.href = "shortcuts://run-shortcut?name=" + encodeURIComponent("Makrolista Askeleet");
+}
+function handleStepsHash(){
+  const m = location.hash.match(/steps=(\d+)/);
+  if (m){
+    const n = parseInt(m[1]) || 0;
+    if (n > 0){
+      if (!state.steps) state.steps = {};
+      state.steps[dateKey(new Date())] = n;
+      save();
+      if (typeof renderToday === "function") renderToday();
+      toast("Askeleet haettu: " + n.toLocaleString("fi-FI"));
+    }
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+}
+window.addEventListener("hashchange", handleStepsHash);
+
+function dayTotals(key){
+  let t = { kcal:0,p:0,h:0,r:0,pr:0 };
+  for (const e of logFor(key)){
+    const x = entryTotals(e);
+    if (!x) continue;
+    t.kcal += x.kcal; t.p += x.p; t.h += x.h; t.r += x.r; t.pr += x.pr;
+  }
+  t.p = r1(t.p); t.h = r1(t.h); t.r = r1(t.r);
+  return t;
+}
+
+// Summaa tarkemmat ravintoaineet päivän kirjatuista aterioista (per ruoka-aine grammojen mukaan)
+function dayNutrients(key){
+  const out = {};
+  for (const [k] of EXT_NUTRIENTS) out[k] = 0;
+  for (const e of logFor(key)){
+    if (e.foodId){
+      const f = food(e.foodId);
+      if (!f || !f.ext) continue;
+      for (const [k] of EXT_NUTRIENTS){
+        const v = f.ext[k];
+        if (v != null && !isNaN(v)) out[k] += v * (e.grams || 0) / 100;
+      }
+    } else {
+      const m = state.meals.find(x => x.id === e.mealId);
+      if (!m) continue;
+      const mult = e.mult || 1;
+      for (const it of m.items){
+        const f = food(it.foodId);
+        if (!f || !f.ext) continue;
+        for (const [k] of EXT_NUTRIENTS){
+          const v = f.ext[k];
+          if (v != null && !isNaN(v)) out[k] += v * it.grams / 100 * mult;
+        }
+      }
+    }
+  }
+  return out;
+}
+
+// ============ TÄNÄÄN (päiväkirjaus) ============
+function renderToday(){
+  const key = dateKey(viewDate);
+  document.getElementById("today-backup").innerHTML = backupStale() ? backupBannerHTML() : "";
+  const t = dayTotals(key), g = state.targets;
+  const left = g.kcal - t.kcal;
+  const bar = (val, goal, color) => {
+    const w = goal > 0 ? Math.min(100, val/goal*100) : 0;
+    return `<div class="track"><div class="fill" style="width:${w}%;background:${color}"></div></div>`;
+  };
+
+  // --- Otsikko + meta + viikkonauha ---
+  const today = new Date(); today.setHours(0,0,0,0);
+  const vd = new Date(viewDate); vd.setHours(0,0,0,0);
+  const diff = Math.round((vd - today) / 86400000);
+  let label;
+  if (diff === 0) label = "Tänään";
+  else if (diff === -1) label = "Eilen";
+  else if (diff === 1) label = "Huomenna";
+  else label = vd.toLocaleDateString("fi-FI", { weekday: "long" });
+  label = label.charAt(0).toUpperCase() + label.slice(1);
+  const dayEntries = logFor(key);
+  const nEntries = dayEntries.length;
+  let dayPrice = 0;
+  for (const e of dayEntries){ const tt = entryTotals(e); if (tt) dayPrice += tt.pr; }
+  const fullDate = vd.toLocaleDateString("fi-FI", { weekday:"long", day:"numeric", month:"numeric" });
+  const metaBits = [fullDate.charAt(0).toUpperCase() + fullDate.slice(1)];
+  if (nEntries) metaBits.push(nEntries + (nEntries === 1 ? " kirjaus" : " kirjausta"));
+  if (dayPrice > 0) metaBits.push(eur(dayPrice));
+  const mon = new Date(vd); mon.setDate(vd.getDate() - ((vd.getDay() + 6) % 7));
+  const WL = ["Ma","Ti","Ke","To","Pe","La","Su"];
+  let daysHtml = "";
+  for (let i = 0; i < 7; i++){
+    const d = new Date(mon); d.setDate(mon.getDate() + i);
+    const dk = dateKey(d);
+    const dd = Math.round((d - today) / 86400000);
+    const cls = [];
+    if (dd === 0) cls.push("today");
+    if (dk === key) cls.push("sel");
+    if (logFor(dk).length) cls.push("logged");
+    const future = dd > 0;
+    if (future) cls.push("future");
+    daysHtml += `<button class="wday ${cls.join(' ')}" ${future ? "disabled" : `onclick="selectViewDate('${dk}')"`}>
+      <span class="wl">${WL[i]}</span><span class="wb">${d.getDate()}</span></button>`;
+  }
+  const m2 = new Date(mon); m2.setDate(mon.getDate() + 7);
+  const nextWeekDisabled = m2 > today;
+  document.getElementById("today-header").innerHTML = `
+    <h1 class="bigtitle">${label}</h1>
+    <div class="todaymeta">${metaBits.join("  ·  ")}</div>
+    <div class="weekstrip">
+      <button class="wk" onclick="shiftWeek(-1)" aria-label="Edellinen viikko">‹</button>
+      <div class="wdays">${daysHtml}</div>
+      <button class="wk" onclick="shiftWeek(1)" ${nextWeekDisabled ? "disabled" : ""} aria-label="Seuraava viikko">›</button>
+    </div>`;
+
+  // --- Makrorengas (energia) + makrolista ---
+  const ePct = g.kcal > 0 ? Math.min(1, t.kcal / g.kcal) : 0;
+  const RC = 2 * Math.PI * 52;
+  const rOff = RC * (1 - ePct);
+  const rbar = (val, goal, color) => {
+    const h = goal > 0 ? Math.min(100, Math.round(val / goal * 100)) : 0;
+    return `<span class="rmbar"><span style="height:${h}%;background:${color}"></span></span>`;
+  };
+  document.getElementById("today-ring").innerHTML = `
+    <button class="ringcard" onclick="openDayDetail()">
+      <div class="ringwrap">
+        <svg viewBox="0 0 120 120" width="150" height="150" aria-hidden="true">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="var(--track)" stroke-width="11"/>
+          <circle cx="60" cy="60" r="52" fill="none" stroke="var(--accent)" stroke-width="11" stroke-linecap="round" stroke-dasharray="${RC.toFixed(1)}" stroke-dashoffset="${rOff.toFixed(1)}" transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="rc"><span class="rl">Energia</span><span class="rn">${t.kcal.toLocaleString("fi-FI")}</span><span class="ru">/ ${g.kcal.toLocaleString("fi-FI")} kcal</span></div>
+      </div>
+      <div class="rmlist">
+        <div class="rm">${rbar(t.p,g.p,"var(--p)")}<div><div class="rmv">${t.p}<small> / ${g.p} g</small></div><div class="rml">Proteiini</div></div></div>
+        <div class="rm">${rbar(t.h,g.h,"var(--h)")}<div><div class="rmv">${t.h}<small> / ${g.h} g</small></div><div class="rml">Hiilihydraatit</div></div></div>
+        <div class="rm">${rbar(t.r,g.r,"var(--r)")}<div><div class="rmv">${t.r}<small> / ${g.r} g</small></div><div class="rml">Rasva</div></div></div>
+      </div>
+    </button>`;
+
+  document.getElementById("today-water").innerHTML = waterCardHTML();
+  document.getElementById("today-steps").innerHTML = stepsCardHTML();
+
+  const entries = logFor(key);
+  document.getElementById("today-meals").innerHTML = entries.length
+    ? entries.map((e, i) => {
+        const tot = entryTotals(e);
+        if (!tot) return "";
+        let icon, name, sub, click;
+        if (e.foodId){
+          const f = food(e.foodId); if (!f) return "";
+          icon = ICONS.item;
+          name = esc(f.name);
+          sub = `${e.grams} g · <b class="bp">P ${tot.p}</b> · <b class="bh">H ${tot.h}</b> · <b class="br">R ${tot.r}</b>`;
+          click = `openFoodModal('${f.id}')`;
+        } else {
+          const m = state.meals.find(x => x.id === e.mealId);
+          icon = mealIcon(m.emoji);
+          const mult = e.mult || 1;
+          name = esc(m.name) + (mult !== 1 ? ` <span class="lr-mult">×${fmtMult(mult)}</span>` : "");
+          sub = `<b class="bp">P ${tot.p}</b> · <b class="bh">H ${tot.h}</b> · <b class="br">R ${tot.r}</b>`;
+          click = `openDetail('${m.id}')`;
+        }
+        return `<div class="card">
+          <div class="m-ic">${icon}</div>
+          <button class="m-info" style="background:none;border:none;text-align:left;padding:0" onclick="${click}">
+            <div class="m-name">${name}</div>
+            <div class="m-sub">${sub}</div>
+          </button>
+          <div class="m-kcal"><div class="k outfit">${tot.kcal}</div><div class="e">${eur(tot.pr)}</div></div>
+          <button class="logdel" onclick="removeLogEntry(${i})" aria-label="Poista kirjaus">✕</button>
+        </div>`;
+      }).join("")
+    : `<div class="empty">Ei kirjauksia tälle päivälle.<br>Kirjaa ateria tai ruoka-aine ＋-napilla.</div>`;
+
+  // "Kopioi edellisen päivän kirjaukset" — näkyy vain jos edellisenä päivänä on kirjauksia
+  const prev = new Date(viewDate); prev.setDate(prev.getDate() - 1);
+  const copyEl = document.getElementById("today-copy");
+  if (copyEl){
+    if (logFor(dateKey(prev)).length){
+      const today0 = new Date(); today0.setHours(0,0,0,0);
+      const vd0 = new Date(viewDate); vd0.setHours(0,0,0,0);
+      const isToday = Math.round((vd0 - today0) / 86400000) === 0;
+      const label = isToday ? "Kopioi eilisen kirjaukset" : "Kopioi edellisen päivän kirjaukset";
+      copyEl.innerHTML = `<button class="linkbtn" onclick="copyPreviousDay()">${ic('copy')} ${label}</button>`;
+    } else {
+      copyEl.innerHTML = "";
+    }
+  }
+}
+
+function shiftDay(d){
+  viewDate.setDate(viewDate.getDate() + d);
+  renderToday();
+}
+function selectViewDate(iso){
+  const d = new Date(iso + "T00:00:00");
+  const today = new Date(); today.setHours(0,0,0,0);
+  if (d > today) return;
+  viewDate = d;
+  renderToday();
+}
+function shiftWeek(n){
+  const d = new Date(viewDate); d.setDate(d.getDate() + n*7);
+  const today = new Date(); today.setHours(23,59,59,999);
+  if (d > today) { viewDate = new Date(); } else { viewDate = d; }
+  renderToday();
+}
+
+// --- Päivän tarkemmat ravintoarvot ---
+function openDayDetail(){
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-daydetail").classList.add("active");
+  document.getElementById("fab").classList.remove("show");
+  renderDayDetail();
+  window.scrollTo(0,0);
+}
+function closeDayDetail(){ showTab("today"); }
+
+function renderDayDetail(){
+  const key = dateKey(viewDate);
+  const t = dayTotals(key);
+  const n = dayNutrients(key);
+  const vd = new Date(viewDate);
+  const dateStr = vd.toLocaleDateString("fi-FI", { weekday:"long", day:"numeric", month:"numeric" });
+  const fmt = (v, unit) => {
+    if (!v) return `<span class="nv empty">–</span>`;
+    const rounded = unit === "g" ? Math.round(v*10)/10 : Math.round(v);
+    return `<span class="nv">${rounded.toLocaleString("fi-FI")} ${unit}</span>`;
+  };
+
+  let html = `<div class="dlabel" style="text-align:center;margin-bottom:16px;text-transform:capitalize">${dateStr}</div>`;
+  // Perusmakrot
+  html += `<div class="nutsum">
+    <div class="ns"><div class="v">${t.kcal}</div><div class="l">kcal</div></div>
+    <div class="ns"><div class="v" style="color:var(--p)">${t.p}</div><div class="l">Prot. g</div></div>
+    <div class="ns"><div class="v" style="color:var(--h)">${t.h}</div><div class="l">Hiil. g</div></div>
+    <div class="ns"><div class="v" style="color:var(--r)">${t.r}</div><div class="l">Rasva g</div></div>
+  </div>`;
+
+  if (!logFor(key).length){
+    html += `<div class="empty">Ei kirjauksia tälle päivälle.<br>Kirjaa aterioita, niin ravintoarvot kertyvät tähän.</div>`;
+    document.getElementById("daydetail-body").innerHTML = html;
+    return;
+  }
+
+  // Ryhmitellyt tarkemmat ravintoaineet
+  for (const [gkey, glabel] of EXT_GROUPS){
+    const nutrients = EXT_NUTRIENTS.filter(x => x[3] === gkey);
+    // näytä vakiomerkinnät aina; muut vain jos arvoa on
+    const visible = nutrients.filter(x => x[4] || n[x[0]] > 0);
+    if (!visible.length) continue;
+    let rows = visible.map(([k,label,unit]) => `
+      <div class="nutrow"><span class="nl">${label}</span>${fmt(n[k], unit)}</div>`).join("");
+    html += `<div class="extsub">${glabel}</div><div class="nutgroup">${rows}</div>`;
+  }
+
+  // Huomautus tyhjistä vitamiineista/kivennäisistä
+  const microFilled = EXT_NUTRIENTS.some(x => (x[3]==="vitamiini"||x[3]==="kivennais") && n[x[0]] > 0);
+  if (!microFilled){
+    html += `<div class="nutnote">Vitamiini- ja kivennäisarvot näkyvät, kun ruoka-aineille on syötetty ne tai ne on saatu skannaamalla. Useimmilla tuotteilla näitä ei ole tietokannoissa.</div>`;
+  } else {
+    html += `<div class="nutnote">Arvot ovat laskennallisia ja perustuvat ruoka-aineiden ravintotietoihin. Kaikilla ruoilla ei ole täydellisiä tietoja, joten summat voivat olla todellista pienempiä.</div>`;
+  }
+  document.getElementById("daydetail-body").innerHTML = html;
+}
+function logMeal(mealId, mult){
+  const key = dateKey(viewDate);
+  if (!state.log[key]) state.log[key] = [];
+  state.log[key].push({ id: uid(), mealId, mult: mult || 1 });
+  save(); closeModal(); renderToday();
+}
+function logFood(foodId, grams){
+  const key = dateKey(viewDate);
+  if (!state.log[key]) state.log[key] = [];
+  state.log[key].push({ id: uid(), foodId, grams: Math.max(0, grams) });
+  save(); closeModal(); renderToday();
+}
+function logFoodFromPicker(foodId){
+  const el = document.getElementById("lg-" + foodId);
+  let g = el ? (parseFloat(String(el.value).replace(",", ".")) || 0) : 0;
+  if (g <= 0) g = state.profile.defaultGrams || 100;
+  logFood(foodId, g);
+}
+function removeLogEntry(i){
+  const key = dateKey(viewDate);
+  if (!state.log[key]) return;
+  state.log[key].splice(i, 1);
+  if (!state.log[key].length) delete state.log[key];
+  save(); renderToday();
+}
+function copyPreviousDay(){
+  const prev = new Date(viewDate); prev.setDate(prev.getDate() - 1);
+  const src = logFor(dateKey(prev));
+  if (!src.length){ toast("Ei kirjauksia edellisenä päivänä."); return; }
+  const key = dateKey(viewDate);
+  const doCopy = () => {
+    if (!state.log[key]) state.log[key] = [];
+    for (const e of src) state.log[key].push({ ...e, id: uid() });
+    save(); closeModal(); renderToday();
+    toast(`Kopioitu ${src.length} kirjausta.`);
+  };
+  if (logFor(key).length){
+    confirmSheet("Kopioi edellisen päivän kirjaukset?", "Kirjaukset lisätään tämän päivän nykyisten kirjausten perään.", "Kopioi", false, doCopy);
+  } else {
+    doCopy();
+  }
+}
+// ============ EDISTYMINEN ============
+function openProgress(){
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-progress").classList.add("active");
+  document.getElementById("fab").classList.remove("show");
+  renderProgress();
+  window.scrollTo(0,0);
+}
+function closeProgress(){ showTab("profile"); }
+
+const WD = ["su","ma","ti","ke","to","pe","la"];
+function last7(){
+  const arr = []; const d = new Date(); d.setHours(0,0,0,0);
+  for (let i=6;i>=0;i--){ const x = new Date(d); x.setDate(d.getDate()-i); arr.push(x); }
+  return arr;
+}
+function fmtKg(v){ return (Math.round(v*10)/10).toString().replace(".", ","); }
+
+// Pylväskaavio: 7 arvoa, tavoite, väri (CSS-muuttuja). Värit style-attribuutilla → mukautuu teemaan.
+function barChartSVG(values, target, color){
+  const W=520, H=150, pad=14, top=12, bot=H-22;
+  const max = Math.max(target||0, ...values, 1) * 1.15;
+  const gap = (W-2*pad)/values.length, bw = gap*0.58;
+  const y = v => top + (1 - v/max)*(bot-top);
+  const labels = last7().map(d => WD[d.getDay()]);
+  const bars = values.map((v,i) => {
+    const cx = pad + gap*i + gap/2, h = Math.max(0, bot - y(v));
+    const rect = v > 0 ? `<rect x="${(cx-bw/2).toFixed(1)}" y="${y(v).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="4" style="fill:${color}" opacity="0.9"/>` : "";
+    return rect + `<text x="${cx.toFixed(1)}" y="${H-6}" font-size="11" style="fill:var(--muted)" text-anchor="middle">${labels[i]}</text>`;
+  }).join("");
+  const tline = target ? `<line x1="${pad}" y1="${y(target).toFixed(1)}" x2="${W-pad}" y2="${y(target).toFixed(1)}" style="stroke:${color}" stroke-width="1.5" stroke-dasharray="5 4" opacity=".6"/>` : "";
+  return `<svg class="prog-chart" viewBox="0 0 ${W} ${H}">${bars}${tline}</svg>`;
+}
+
+// Painokäyrä. points: [{key,kg}] nousevassa järjestyksessä.
+function weightChartSVG(points){
+  const W=520, H=150, pad=14, top=14, bot=H-24;
+  if (points.length === 1){
+    const cy=(top+bot)/2;
+    return `<svg class="prog-chart" viewBox="0 0 ${W} ${H}"><circle cx="${W/2}" cy="${cy}" r="4" fill="#fff" style="stroke:var(--accent)" stroke-width="2.5"/><text x="${W/2}" y="${cy-12}" font-size="12" style="fill:var(--muted)" text-anchor="middle">${fmtKg(points[0].kg)} kg</text></svg>`;
+  }
+  const kgs = points.map(p=>p.kg);
+  let min=Math.min(...kgs)-0.4, max=Math.max(...kgs)+0.4;
+  if (max-min < 1){ const m=(max+min)/2; min=m-0.6; max=m+0.6; }
+  const x = i => pad + i*(W-2*pad)/(points.length-1);
+  const y = v => top + (max-v)/(max-min)*(bot-top);
+  const line = points.map((p,i)=>`${i?'L':'M'}${x(i).toFixed(1)} ${y(p.kg).toFixed(1)}`).join(" ");
+  const area = `M${x(0)} ${bot} ` + points.map((p,i)=>`L${x(i).toFixed(1)} ${y(p.kg).toFixed(1)}`).join(" ") + ` L${x(points.length-1).toFixed(1)} ${bot} Z`;
+  const dots = points.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.kg).toFixed(1)}" r="3" fill="#fff" style="stroke:var(--accent)" stroke-width="2"/>`).join("");
+  return `<svg class="prog-chart" viewBox="0 0 ${W} ${H}"><path d="${area}" style="fill:var(--accent-soft)" opacity=".55"/><path d="${line}" fill="none" style="stroke:var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>`;
+}
+
+function renderProgress(){
+  const keys = last7().map(dateKey);
+  const loggedKeys = keys.filter(k => logFor(k).length > 0);
+
+  // --- Paino ---
+  const wEntries = Object.keys(state.weights || {}).sort().map(k => ({ key:k, kg:state.weights[k] }));
+  let weightCard;
+  if (!wEntries.length){
+    weightCard = `<div class="pcard">
+      <div class="empty" style="margin:0 0 12px">Ei painokirjauksia vielä.<br>Kirjaa paino, niin näet kehityksen ajan myötä.</div>
+      <button class="btn primary" style="width:100%" onclick="openWeightModal()">＋ Kirjaa paino</button></div>`;
+  } else {
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-30);
+    const cKey = dateKey(cutoff);
+    const win = wEntries.filter(e => e.key >= cKey);
+    const pts = win.length ? win : wEntries.slice(-1);
+    const cur = pts[pts.length-1].kg;
+    const goalLbl = { lose:"painonpudotus", maintain:"ylläpito", gain:"lihasmassan kasvatus" }[state.profile.goal] || "";
+    let deltaPill = "";
+    if (pts.length > 1){
+      const delta = Math.round((cur - pts[0].kg)*10)/10;
+      const spanDays = Math.max(1, Math.round((new Date(pts[pts.length-1].key) - new Date(pts[0].key))/86400000));
+      const good = (state.profile.goal==="lose" && delta<0) || (state.profile.goal==="gain" && delta>0);
+      deltaPill = `<span class="prog-delta ${good?"good":""}">${(delta>0?"+":"")+fmtKg(delta)} kg · ${spanDays} pv</span>`;
+    }
+    weightCard = `<div class="pcard">
+      <div class="prog-top"><span class="prog-big">${fmtKg(cur)}</span><span class="prog-unit">kg</span>${deltaPill}</div>
+      <div class="prog-sub">Tavoite: ${goalLbl}</div>
+      ${weightChartSVG(pts)}
+      <button class="btn primary" style="width:100%;margin-top:12px" onclick="openWeightModal()">＋ Kirjaa paino</button>
+    </div>`;
+  }
+
+  // --- Energia ---
+  const eVals = keys.map(k => dayTotals(k).kcal);
+  const eAvg = loggedKeys.length ? Math.round(loggedKeys.reduce((a,k)=>a+dayTotals(k).kcal,0)/loggedKeys.length) : 0;
+  const eTarget = state.targets.kcal;
+  const energyCard = `<div class="pcard">
+    <div class="prog-avgrow">
+      <div class="prog-avg"><div class="v">${eAvg.toLocaleString("fi-FI")}</div><div class="l">ka. kcal / pv</div></div>
+      <div class="prog-avg right"><div class="v" style="color:var(--accent-2)">${loggedKeys.length}/7</div><div class="l">päivää kirjattu</div></div>
+    </div>
+    ${barChartSVG(eVals, eTarget, "var(--accent-2)")}
+    <div class="prog-legend"><span class="dash" style="color:var(--accent-2)"></span> Tavoite ${eTarget.toLocaleString("fi-FI")} kcal</div>
+  </div>`;
+
+  // --- Proteiini ---
+  const pVals = keys.map(k => dayTotals(k).p);
+  const pAvg = loggedKeys.length ? Math.round(loggedKeys.reduce((a,k)=>a+dayTotals(k).p,0)/loggedKeys.length) : 0;
+  const pTarget = state.targets.p;
+  const pPct = pTarget > 0 ? Math.round(pAvg/pTarget*100) : 0;
+  const proteinCard = `<div class="pcard">
+    <div class="prog-avgrow">
+      <div class="prog-avg"><div class="v" style="color:var(--p)">${pAvg} g</div><div class="l">ka. / pv · tavoite ${pTarget} g</div></div>
+      <div class="prog-avg right"><div class="v">${pPct} %</div><div class="l">tavoitteesta</div></div>
+    </div>
+    ${barChartSVG(pVals, pTarget, "var(--p)")}
+    <div class="prog-legend"><span class="dash" style="color:var(--p)"></span> Tavoite ${pTarget} g</div>
+  </div>`;
+
+  // --- Vesi ---
+  const wVals = keys.map(k => waterFor(k));
+  const wDays = keys.filter(k => waterFor(k) > 0);
+  const wAvg = wDays.length ? Math.round(wDays.reduce((a,k)=>a+waterFor(k),0)/wDays.length) : 0;
+  const wTarget = state.profile.waterTarget || 2500;
+  const L = v => (v/1000).toFixed(1).replace(".", ",");
+  const waterCard = `<div class="pcard">
+    <div class="prog-avgrow">
+      <div class="prog-avg"><div class="v" style="color:var(--water)">${L(wAvg)} l</div><div class="l">ka. / pv · tavoite ${L(wTarget)} l</div></div>
+      <div class="prog-avg right"><div class="v">${wDays.length}/7</div><div class="l">päivää kirjattu</div></div>
+    </div>
+    ${barChartSVG(wVals, wTarget, "var(--water)")}
+    <div class="prog-legend"><span class="dash" style="color:var(--water)"></span> Tavoite ${L(wTarget)} l</div>
+  </div>`;
+
+  document.getElementById("progress-body").innerHTML =
+    `<div class="h2">PAINO</div>${weightCard}
+     <div class="h2">ENERGIA — VIIMEISET 7 PÄIVÄÄ</div>${energyCard}
+     <div class="h2">PROTEIINI — VIIMEISET 7 PÄIVÄÄ</div>${proteinCard}
+     <div class="h2">VESI — VIIMEISET 7 PÄIVÄÄ</div>${waterCard}`;
+}
+
+function openWeightModal(){
+  sheet.innerHTML = `
+    <h3>Kirjaa paino</h3>
+    <div class="field"><label for="wt-kg">Paino (kg)</label>
+      <input id="wt-kg" inputmode="decimal" value="${fmtKg(state.profile.weight || 0)}" placeholder="esim. 79,5"></div>
+    <div class="hint">Tallentuu tämän päivän painoksi ja päivittää profiilin painon.</div>
+    <div class="btnrow">
+      <button class="btn ghost" onclick="closeModal()">Peruuta</button>
+      <button class="btn primary" onclick="saveWeight()">Tallenna</button>
+    </div>`;
+  overlay.classList.add("show");
+  setTimeout(() => document.getElementById("wt-kg").focus(), 100);
+}
+function saveWeight(){
+  const kg = num("wt-kg");
+  if (kg <= 0){ document.getElementById("wt-kg").focus(); return; }
+  state.weights[dateKey(new Date())] = kg;
+  state.profile.weight = kg;
+  applyCalculated();
+  save(); closeModal(); renderProgress(); renderToday();
+  toast("Paino kirjattu.");
+}
+function setWaterTarget(v){
+  const l = parseFloat(String(v).replace(",", ".")) || 0;
+  state.profile.waterTarget = Math.max(0, Math.round(l*1000));
+  save(); renderProfile(); renderToday();
+}
+
+// ============ EDULLISIN PROTEIINI (proteiini / €) ============
+function openProteinValue(){
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-protein").classList.add("active");
+  document.getElementById("fab").classList.remove("show");
+  renderProteinValue();
+  window.scrollTo(0,0);
+}
+function closeProteinValue(){ showTab("profile"); }
+function renderProteinValue(){
+  const list = state.foods
+    .filter(f => f.price > 0 && f.p > 0)
+    .map(f => ({ f, val: f.p / f.price }))   // g proteiinia / €
+    .sort((a,b) => b.val - a.val);
+  const excluded = state.foods.length - list.length;
+  const body = document.getElementById("protein-body");
+  if (!list.length){
+    body.innerHTML = `<div class="empty">Ei laskettavia ruoka-aineita.<br>Lisää ruoka-aineille proteiini ja hinta, niin näet vertailun.</div>`;
+    return;
+  }
+  const maxVal = list[0].val;
+  let html = `<div class="prog-sub" style="margin:0 2px 12px">Kuinka paljon proteiinia saat eurolla. Mitä suurempi luku, sitä edullisempaa proteiini on. Napauta riviä muokataksesi hintaa tai arvoja.</div>`;
+  html += `<div class="panel">` + list.map((it, i) => {
+    const f = it.f;
+    const gpe = Math.round(it.val);
+    const w = maxVal > 0 ? Math.round(it.val / maxVal * 100) : 0;
+    return `<button class="pv-row" onclick="openFoodModal('${f.id}')">
+      <span class="pv-rank ${i<3?'top':''}">${i+1}</span>
+      <span class="pv-info">
+        <span class="pv-nm">${esc(f.name)}</span>
+        <span class="pv-sub">${f.p} g proteiinia · ${eur(f.price)}/100 g</span>
+        <span class="pv-bar"><span style="width:${w}%"></span></span>
+      </span>
+      <span class="pv-val"><b>${gpe}</b><small>g/€</small></span>
+    </button>`;
+  }).join("") + `</div>`;
+  if (excluded > 0){
+    html += `<div class="nutnote">${excluded} ruoka-ainetta ei näy, koska niiltä puuttuu proteiini- tai hintatieto.</div>`;
+  }
+  body.innerHTML = html;
+}
+
+let logMult = {}, logGrams = {}, logQuery = "";
+function openLogPicker(){
+  logMult = {}; logGrams = {}; logQuery = "";
+  sheet.innerHTML = `
+    <h3>Kirjaa</h3>
+    <input class="search" id="lg-search" style="background:var(--field)" placeholder="Hae ateria tai ruoka-aine…" oninput="setLogQuery(this.value)">
+    <div id="lg-lists"></div>
+    <button class="btn ghost" style="margin-top:16px;width:100%" onclick="closeModal()">Sulje</button>`;
+  renderLogLists();
+  overlay.classList.add("show");
+}
+function setLogQuery(v){ logQuery = v.trim().toLowerCase(); renderLogLists(); }
+function logPickStep(id, d){
+  logMult[id] = Math.max(0.5, Math.round(((logMult[id] || 1) + d) * 10) / 10);
+  renderLogLists();
+}
+function renderLogLists(){
+  const q = logQuery;
+  const meals = state.meals.filter(m => !q || m.name.toLowerCase().includes(q));
+  const foods = state.foods
+    .filter(f => !q || f.name.toLowerCase().includes(q))
+    .sort((a,b) => a.name.localeCompare(b.name, "fi"));
+  let html = "";
+  if (meals.length){
+    html += `<div class="h2" style="margin:14px 2px 8px">Ateriat</div><div class="panel">`;
+    html += meals.map(m => {
+      const mult = logMult[m.id] || 1;
+      const t = mealTotals(m);
+      return `<div class="logrow">
+        <span class="m-ic">${mealIcon(m.emoji)}</span>
+        <span class="lr-info"><span class="lr-nm">${esc(m.name)}</span>
+          <span class="lr-sub">${Math.round(t.kcal*mult)} kcal · P ${r1(t.p*mult)} · H ${r1(t.h*mult)} · R ${r1(t.r*mult)}</span></span>
+        <span class="gstep">
+          <button onclick="logPickStep('${m.id}',-0.5)" aria-label="Vähennä">−</button>
+          <span class="gq">${fmtMult(mult)}</span>
+          <button onclick="logPickStep('${m.id}',0.5)" aria-label="Lisää">＋</button>
+        </span>
+        <button class="libadd" onclick="logMeal('${m.id}',${mult})">Kirjaa</button>
+      </div>`;
+    }).join("") + `</div>`;
+  }
+  html += `<div class="h2" style="margin:14px 2px 8px">Ruoka-aineet</div>`;
+  if (foods.length){
+    html += `<div class="panel">` + foods.map(f => {
+      const g = (logGrams[f.id] != null && logGrams[f.id] !== "") ? logGrams[f.id] : (state.profile.defaultGrams || 100);
+      return `<div class="logrow">
+        <span class="m-ic">${ICONS.item}</span>
+        <span class="lr-info"><span class="lr-nm">${esc(f.name)}</span>
+          <span class="lr-sub">${f.kcal} kcal · P ${f.p} · H ${f.h} · R ${f.r} / 100 g</span></span>
+        <span class="grwrap"><input type="number" inputmode="decimal" min="0" value="${g}" id="lg-${f.id}" oninput="logGrams['${f.id}']=this.value" aria-label="Grammat"><span>g</span></span>
+        <button class="libadd" onclick="logFoodFromPicker('${f.id}')">Kirjaa</button>
+      </div>`;
+    }).join("") + `</div>`;
+  } else {
+    html += `<div class="empty" style="margin:0">${q ? "Ei osumia haulle." : "Ruoka-ainekirjasto on tyhjä."}</div>`;
+  }
+  document.getElementById("lg-lists").innerHTML = html;
+}
+
+function mealCards(){
+  return state.meals.map(m => {
+    const t = mealTotals(m);
+    return `<button class="card" onclick="openDetail('${m.id}')">
+      <div class="m-ic">${mealIcon(m.emoji)}</div>
+      <div class="m-info">
+        <div class="m-name">${esc(m.name)}</div>
+        <div class="m-sub"><b class="bp">P ${t.p}</b> · <b class="bh">H ${t.h}</b> · <b class="br">R ${t.r}</b></div>
+      </div>
+      <div class="m-kcal"><div class="k outfit">${t.kcal}</div><div class="e">${eur(t.pr)}</div></div>
+      <span class="chev">›</span>
+    </button>`;
+  }).join("");
+}
+
+// ============ ATERIAT ============
+function renderMeals(){
+  document.getElementById("meals-list").innerHTML = mealCards() ||
+    `<div class="empty">Ateriakirjasto on tyhjä.<br>Luo ateria ＋-napilla ja kokoa siihen ruoka-aineet kirjastosta.</div>`;
+}
+
+// ============ ATERIAN MUOKKAUS ============
+let currentMeal = null;
+
+function openDetail(id){
+  currentMeal = id;
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-detail").classList.add("active");
+  document.getElementById("fab").classList.remove("show");
+  document.getElementById("d-search").value = "";
+  renderDetail();
+  window.scrollTo(0,0);
+}
+function closeDetail(){
+  currentMeal = null;
+  showTab(lastTab === "photos" ? "today" : lastTab);
+}
+
+function renderDetail(){
+  const m = state.meals.find(x => x.id === currentMeal);
+  if (!m){ closeDetail(); return; }
+  document.getElementById("d-title").textContent = m.name;
+  const rows = m.items.map((it, i) => {
+    const f = food(it.foodId);
+    if (!f) return "";
+    const kcal = Math.round(f.kcal * it.grams / 100);
+    return `<div class="ig">
+      <div class="nm">${esc(f.name)}</div>
+      <div class="grwrap"><input type="number" inputmode="decimal" min="0" value="${it.grams}" aria-label="Grammat" onchange="setGrams(${i}, this.value)"><span>g</span></div>
+      <div class="kc outfit">${kcal}<small>kcal</small></div>
+      <button class="del" onclick="removeIng(${i})" aria-label="Poista rivi">✕</button>
+    </div>`;
+  }).join("");
+  document.getElementById("d-ings").innerHTML = (rows || `<div class="ig" style="color:var(--muted)">Ei vielä ruoka-aineita — lisää alta kirjastosta.</div>`);
+  const t = mealTotals(m);
+  document.getElementById("d-sum").innerHTML = `
+    <div class="chip"><div class="v outfit">${t.kcal}</div><div class="l">kcal</div></div>
+    <div class="chip"><div class="v outfit" style="color:var(--p)">${t.p} g</div><div class="l">proteiini</div></div>
+    <div class="chip"><div class="v outfit" style="color:var(--h)">${t.h} g</div><div class="l">hiilarit</div></div>
+    <div class="chip"><div class="v outfit" style="color:var(--r)">${t.r} g</div><div class="l">rasva</div></div>
+    <div class="chip"><div class="v outfit" style="color:var(--eur)">${t.pr.toFixed(2).replace(".",",")}</div><div class="l">€</div></div>`;
+  renderLibrary();
+}
+
+function renderLibrary(){
+  const q = document.getElementById("d-search").value.trim().toLowerCase();
+  const list = state.foods
+    .filter(f => !q || f.name.toLowerCase().includes(q))
+    .sort((a,b) => a.name.localeCompare(b.name, "fi"));
+  const rows = list.map(f => {
+    const flashed = addedFlash[f.id];
+    return `<div class="ig">
+      <button class="nm" onclick="openFoodModal('${f.id}')">${esc(f.name)}
+        <div class="libmeta">${f.kcal} kcal · P ${f.p} · H ${f.h} · R ${f.r} / 100 g</div>
+      </button>
+      <button class="libadd ${flashed ? "added" : ""}" onclick="addIng('${f.id}')">${flashed ? "✓ Lisätty" : "＋ lisää"}</button>
+    </div>`;
+  }).join("");
+  document.getElementById("d-lib").innerHTML = rows +
+    `<button class="addrow" onclick="startScanner()">${ic('camera')} Skannaa viivakoodilla</button>
+     <button class="addrow" style="background:none;color:var(--muted)" onclick="openFoodModal()">＋ Uusi ruoka-aine käsin</button>`;
+}
+
+let addedFlash = {};   // foodId -> timeout (näyttää "Lisätty")
+function addIng(foodId){
+  const m = state.meals.find(x => x.id === currentMeal);
+  m.items.push({ foodId, grams: state.profile.defaultGrams || 100 });
+  save();
+  if (addedFlash[foodId]) clearTimeout(addedFlash[foodId]);
+  addedFlash[foodId] = setTimeout(() => { delete addedFlash[foodId]; renderLibrary(); }, 1200);
+  renderDetail();
+}
+function removeIng(i){
+  const m = state.meals.find(x => x.id === currentMeal);
+  m.items.splice(i, 1);
+  save(); renderDetail();
+}
+function setGrams(i, v){
+  const m = state.meals.find(x => x.id === currentMeal);
+  m.items[i].grams = Math.max(0, parseFloat(String(v).replace(",", ".")) || 0);
+  save(); renderDetail();
+}
+
+// ============ KAUPPALISTA ============
+function renderShop(){
+  const all = state.shop;
+  const undone = all.filter(it => !it.done);
+  const doneItems = all.filter(it => it.done);
+  const totalAll = all.reduce((a,it) => a + it.pr*it.q, 0);
+  const remaining = undone.reduce((a,it) => a + it.pr*it.q, 0);
+  const collected = doneItems.reduce((a,it) => a + it.pr*it.q, 0);
+  const totalCount = all.length, doneCount = doneItems.length;
+  const pct = totalCount ? Math.round(doneCount/totalCount*100) : 0;
+
+  document.getElementById("shop-total").innerHTML = `
+    <div class="sumcard">
+      <div class="half">
+        <div class="slbl">Ostoskori</div>
+        <div class="sbig">${doneCount} / ${totalCount}</div>
+        <div class="ssub">kerätty</div>
+        <div class="sbar"><div style="width:${pct}%"></div></div>
+      </div>
+      <div class="half">
+        <div class="slbl">Hinta-arvio</div>
+        <div class="sbig eur">${eur(totalAll)}</div>
+        <div class="ssub">jäljellä ${eur(remaining)}</div>
+      </div>
+    </div>`;
+
+  if (!all.length){
+    document.getElementById("shop-list").innerHTML =
+      `<div class="empty">Kauppalista on tyhjä.<br>Lisää tuotteita ＋-napilla, lue ne kuitista Kuvat-välilehdellä tai luo lista aterioista alta.</div>
+       <button class="linkbtn" onclick="openGenerator()">${ic('sparkles')} Luo lista aterioista</button>`;
+    return;
+  }
+
+  const rowHtml = (it) => {
+    const i = state.shop.indexOf(it);
+    const meals = (it.meals && it.meals.length) ? `<div class="smeals">${esc(it.meals.join(", "))}</div>` : "";
+    return `<div class="sitem ${it.done ? "done" : ""}">
+      <button class="chk" role="checkbox" aria-checked="${it.done}" onclick="toggleDone(${i})">✓</button>
+      <button class="sinfo" onclick="openShopModal('${it.id}')">
+        <div class="snm">${esc(it.nm)}</div>
+        <div class="sdt">${it.dt ? esc(it.dt) + " · " : ""}${it.q} × ${eur(it.pr)}</div>
+        ${meals}
+      </button>
+      <div class="step">
+        <button aria-label="Vähennä" onclick="changeQty(${i},-1)">−</button>
+        <span class="q">${it.q}</span>
+        <button aria-label="Lisää" onclick="changeQty(${i},1)">＋</button>
+      </div>
+      <div class="spr ${it.q===0 ? "zero" : ""}">${eur(it.pr*it.q)}</div>
+    </div>`;
+  };
+
+  let html = "";
+  if (undone.length){
+    // ryhmittele ostettavat osastoittain
+    for (const [key, label] of SHOP_CATS){
+      const items = undone.filter(it => (it.cat || "muut") === key);
+      if (!items.length) continue;
+      const sum = items.reduce((a,it) => a + it.pr*it.q, 0);
+      html += `<div class="secthead"><span>${esc(label)}</span><span class="scnt">${items.length} · ${eur(sum)}</span></div>`;
+      html += items.map(rowHtml).join("");
+    }
+  } else {
+    html += `<div class="empty" style="padding:20px;margin-top:8px">${ic('check')} Kaikki kerätty</div>`;
+  }
+  if (doneItems.length){
+    html += `<div class="secthead"><span>KORISSA</span><span class="scnt">${doneItems.length} tuotetta · ${eur(collected)}</span></div>`;
+    html += doneItems.map(rowHtml).join("");
+    html += `<button class="linkbtn" onclick="clearDone()">Tyhjennä kori</button>`;
+  }
+  html += `<button class="linkbtn" onclick="openGenerator()">${ic('sparkles')} Luo lista aterioista</button>`;
+  html += `<button class="linkbtn" style="color:var(--danger)" onclick="clearAllShop()">Tyhjennä koko lista</button>`;
+  document.getElementById("shop-list").innerHTML = html;
+}
+function toggleDone(i){ state.shop[i].done = !state.shop[i].done; save(); renderShop(); }
+function changeQty(i, d){ state.shop[i].q = Math.max(0, state.shop[i].q + d); save(); renderShop(); }
+function clearDone(){ state.shop = state.shop.filter(it => !it.done); save(); renderShop(); }
+function clearAllShop(){
+  confirmSheet("Tyhjennetäänkö koko kauppalista?", "Poistaa kaikki listan tuotteet (sekä ostettavat että kerätyt). Tätä ei voi perua.", "Tyhjennä lista", true, () => {
+    state.shop = [];
+    save(); renderShop();
+  });
+}
+
+// ---- Kauppalistan generointi aterioista ----
+let genServings = {};
+function openGenerator(){
+  if (!state.meals.length){
+    sheet.innerHTML = `
+      <h3>Luo lista aterioista</h3>
+      <div class="empty" style="margin:0">Sinulla ei ole vielä ateriapohjia.<br>Luo ateria <b>Ateriat</b>-välilehdellä, niin voit koota kauppalistan niistä.</div>
+      <button class="btn ghost" style="margin-top:16px;width:100%" onclick="closeModal()">Sulje</button>`;
+    overlay.classList.add("show");
+    return;
+  }
+  genServings = {};
+  for (const m of state.meals) genServings[m.id] = 0;
+  renderGenerator();
+  overlay.classList.add("show");
+}
+function renderGenerator(){
+  const rows = state.meals.map(m => {
+    const mt = mealTotals(m);
+    const n = genServings[m.id] || 0;
+    return `<div class="genrow">
+      <span class="m-ic">${mealIcon(m.emoji)}</span>
+      <span class="gnm">${esc(m.name)}<small>${mt.kcal} kcal / annos</small></span>
+      <span class="gstep">
+        <button onclick="genStep('${m.id}',-1)" aria-label="Vähennä">−</button>
+        <span class="gq">${n}</span>
+        <button onclick="genStep('${m.id}',1)" aria-label="Lisää">＋</button>
+      </span>
+    </div>`;
+  }).join("");
+  sheet.innerHTML = `
+    <h3>Luo lista aterioista</h3>
+    <div class="hint" style="margin:0 0 12px">Valitse, montako kertaa kukin ateria on tarkoitus syödä. Tarvittavat raaka-aineet pyöristetään kokonaisiksi pakkauksiksi (rasia, pussi, paketti).</div>
+    <div class="panel">${rows}</div>
+    <div class="pstatus" id="gen-msg" style="color:var(--danger)"></div>
+    <div class="btnrow">
+      <button class="btn ghost" onclick="closeModal()">Peruuta</button>
+      <button class="btn primary" onclick="runGenerator()">Luo lista</button>
+    </div>`;
+}
+function genStep(id, d){
+  genServings[id] = Math.max(0, (genServings[id] || 0) + d);
+  renderGenerator();
+}
+function runGenerator(){
+  // summaa grammat ruoka-aineittain + kerää mistä aterioista
+  const need = {};     // foodId -> grams
+  const origins = {};  // foodId -> Set(aterian nimi)
+  for (const m of state.meals){
+    const n = genServings[m.id] || 0;
+    if (!n) continue;
+    for (const it of m.items){
+      need[it.foodId] = (need[it.foodId] || 0) + it.grams * n;
+      (origins[it.foodId] = origins[it.foodId] || new Set()).add(m.name);
+    }
+  }
+  const foodIds = Object.keys(need);
+  if (!foodIds.length){
+    const el = document.getElementById("gen-msg");
+    if (el) el.textContent = "Valitse vähintään yhdelle aterialle annosmäärä.";
+    return;
+  }
+  let added = 0, updated = 0;
+  for (const fid of foodIds){
+    const f = food(fid);
+    if (!f) continue;
+    const grams = Math.round(need[fid]);
+    let dt, pr, q;
+    if (f.pkg && f.pkg.grams > 0 && f.pkg.price > 0){
+      // pyöristä ylöspäin kokonaisiksi pakkauksiksi
+      q = Math.max(1, Math.ceil(grams / f.pkg.grams));
+      pr = f.pkg.price;
+      dt = f.pkg.label || (f.pkg.grams + " g");
+    } else {
+      // ei pakkaustietoa → yksi rivi, arvioitu kokonaishinta tarpeesta
+      q = 1;
+      pr = Math.round(f.price * grams / 100 * 100) / 100;
+      dt = "tarve ~" + (grams >= 1000 ? (grams/1000).toFixed(1).replace(".",",") + " kg" : grams + " g");
+    }
+    const meals = [...(origins[fid] || [])];
+    const cat = f.cat || "muut";
+    const existing = state.shop.find(s => s.nm.toLowerCase() === f.name.toLowerCase());
+    if (existing){
+      existing.q = q; existing.pr = pr; existing.dt = dt; existing.done = false;
+      existing.meals = meals; existing.cat = cat;
+      updated++;
+    } else {
+      state.shop.push({ id: uid(), nm: f.name, dt, pr, q, done: false, meals, cat });
+      added++;
+    }
+  }
+  save(); closeModal(); showTab("shop");
+}
+
+// ============ KUVAT ============
+let currentPhoto = null;   // avattu kuvatietue
+let urlCache = {};         // objectURL:t
+
+function photoURL(p){
+  if (!urlCache[p.id]) urlCache[p.id] = URL.createObjectURL(p.blob);
+  return urlCache[p.id];
+}
+
+async function renderPhotos(){
+  const el = document.getElementById("photo-grid");
+  let photos = [];
+  try { photos = await dbAll(); } catch(e){
+    el.innerHTML = `<div class="empty">Kuvien tallennus ei ole käytettävissä tässä selaimessa.</div>`;
+    return;
+  }
+  photos.sort((a,b) => b.ts - a.ts);
+  if (!photos.length){
+    el.innerHTML = `<div class="empty">Ei vielä kuvia.<br>Kuvaa kuitti tai hintalappu kamerapainikkeella.</div>`;
+    return;
+  }
+  el.innerHTML = `<div class="pgrid">` + photos.map(p => `
+    <button class="pcell" onclick="openPhoto('${p.id}')">
+      <img src="${photoURL(p)}" alt="${esc(p.note || "Kuva")}">
+      ${p.items && p.items.length ? `<span class="pbadge">${p.items.length}</span>` : ""}
+      <span class="pdate">${new Date(p.ts).toLocaleDateString("fi-FI")}${p.note ? " · " + esc(p.note) : ""}</span>
+    </button>`).join("") + `</div>`;
+}
+
+async function capturePhoto(file){
+  const blob = await downscale(file);
+  const p = { id: uid(), ts: Date.now(), note: "", blob, text: null, items: [] };
+  await dbPut(p);
+  openPhoto(p.id);
+}
+
+async function downscale(file){
+  try {
+    const img = await createImageBitmap(file);
+    const max = 1600;
+    const sc = Math.min(1, max / Math.max(img.width, img.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(img.width * sc);
+    c.height = Math.round(img.height * sc);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    return await new Promise(res => c.toBlob(res, "image/jpeg", 0.85));
+  } catch(e){ return file; }
+}
+
+async function openPhoto(id){
+  currentPhoto = await dbGet(id);
+  if (!currentPhoto) return;
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-photoview").classList.add("active");
+  document.getElementById("fab").classList.remove("show");
+  document.getElementById("pv-title").textContent = new Date(currentPhoto.ts).toLocaleDateString("fi-FI");
+  document.getElementById("pv-img").src = photoURL(currentPhoto);
+  document.getElementById("pv-note").value = currentPhoto.note || "";
+  document.getElementById("pv-bar").classList.remove("show");
+  const btn = document.getElementById("pv-ocr");
+  btn.disabled = false;
+  btn.innerHTML = ic('search') + (currentPhoto.items.length ? " Lue uudelleen" : " Lue tuotteet ja hinnat");
+  renderParsed();
+  window.scrollTo(0,0);
+}
+function closePhoto(){
+  currentPhoto = null;
+  showTab("photos");
+}
+async function savePhotoNote(v){
+  if (!currentPhoto) return;
+  currentPhoto.note = v.trim();
+  await dbPut(currentPhoto);
+  }
+async function deletePhoto(){
+  if (!currentPhoto) return;
+  if (!confirm("Poistetaanko kuva pysyvästi?")) return;
+  if (urlCache[currentPhoto.id]){ URL.revokeObjectURL(urlCache[currentPhoto.id]); delete urlCache[currentPhoto.id]; }
+  await dbDel(currentPhoto.id);
+  closePhoto();
+}
+
+// ---------- OCR ----------
+let tessLoading = null;
+function loadTesseract(){
+  if (window.Tesseract) return Promise.resolve();
+  if (tessLoading) return tessLoading;
+  tessLoading = new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+    s.onload = res;
+    s.onerror = () => { tessLoading = null; rej(new Error("verkkovirhe")); };
+    document.head.appendChild(s);
+  });
+  return tessLoading;
+}
+
+async function startOCR(){
+  if (!currentPhoto) return;
+  const btn = document.getElementById("pv-ocr");
+  const bar = document.getElementById("pv-bar");
+  const fill = document.getElementById("pv-barfill");
+  btn.disabled = true;
+  btn.textContent = "Ladataan tunnistusta…";
+  bar.classList.add("show"); fill.style.width = "5%";
+  try {
+    await loadTesseract();
+    btn.textContent = "Luetaan kuvaa…";
+    const worker = await Tesseract.createWorker("fin", 1, {
+      logger: m => {
+        if (m.status === "recognizing text") fill.style.width = Math.round(10 + m.progress*88) + "%";
+      }
+    });
+    const { data } = await worker.recognize(currentPhoto.blob);
+    await worker.terminate();
+    fill.style.width = "100%";
+    currentPhoto.text = data.text;
+    currentPhoto.items = parseReceiptText(data.text).map(r => ({ ...r, sel: true }));
+    await dbPut(currentPhoto);
+    renderParsed();
+    btn.innerHTML = currentPhoto.items.length ? ic('search') + " Lue uudelleen" : "Ei rivejä — kokeile uutta kuvaa";
+  } catch(e){
+    btn.textContent = "Luku epäonnistui — yritä uudelleen";
+    document.getElementById("pv-hint").textContent =
+      "Tunnistuskirjaston lataus vaatii verkkoyhteyden ensimmäisellä kerralla. Tarkista yhteys ja yritä uudelleen.";
+  } finally {
+    btn.disabled = false;
+    setTimeout(() => bar.classList.remove("show"), 800);
+  }
+}
+
+// Kuittitekstin jäsennys: rivit "Tuotenimi   X,XX B" → {nm, pr}
+function parseReceiptText(text){
+  const SKIP = /yhteens|välisumma|kortti|kuponki|pantti|alennus|säästö|y-tunnus|palautus|kuitti|maksu\b|osto\b|käteinen|kollikatu|asiakaspalvelu|^\s*eur\s*$|veroton|alv|summa/i;
+  const out = [];
+  for (const raw of String(text).split(/\n/)){
+    const line = raw.trim();
+    if (!line || SKIP.test(line)) continue;
+    if (/\d\s*[xX×]\s*\d/.test(line)) continue;          // määrärivit "2 x 2,95"
+    if (/EUR\s*\/?\s*k?g/i.test(line)) continue;         // kilohintarivit
+    const m = line.match(/^(.+?)\s+(-?\d{1,4}[.,]\d{2})\s*[ABV]?\s*$/);
+    if (!m) continue;
+    const nm = m[1].replace(/\s{2,}/g, " ").replace(/[*·]+$/,"").trim();
+    const pr = Math.round(parseFloat(m[2].replace(",", ".")) * 100) / 100;
+    if (pr <= 0 || pr > 500) continue;
+    if (nm.length < 3 || /^[\d\s.,-]+$/.test(nm)) continue;
+    out.push({ nm, pr });
+  }
+  return out;
+}
+
+// Sumea haku: löytyykö kauppalistalta vastaava tuote
+function normTokens(s){
+  return String(s).toLowerCase().replace(/[^a-zåäö0-9 ]/gi, " ").split(/\s+/).filter(t => t.length >= 4);
+}
+function findShopMatch(nm){
+  const a = normTokens(nm);
+  let best = null, bestScore = 0;
+  for (const it of state.shop){
+    const b = normTokens(it.nm);
+    const score = a.filter(t => b.some(x => x.includes(t) || t.includes(x))).length;
+    if (score > bestScore){ bestScore = score; best = it; }
+  }
+  return bestScore > 0 ? best : null;
+}
+// Sumea haku ruoka-ainekirjastosta (kuittirivin nimi → kirjaston tuote)
+function findFoodMatch(nm){
+  const a = normTokens(nm);
+  let best = null, bestScore = 0;
+  for (const f of state.foods){
+    const b = normTokens(f.name);
+    const score = a.filter(t => b.some(x => x.includes(t) || t.includes(x))).length;
+    if (score > bestScore){ bestScore = score; best = f; }
+  }
+  return bestScore > 0 ? best : null;
+}
+
+function renderParsed(){
+  const el = document.getElementById("pv-results");
+  if (!currentPhoto || !currentPhoto.items.length){ el.innerHTML = ""; return; }
+  const rows = currentPhoto.items.map((r, i) => {
+    const match = findShopMatch(r.nm);
+    const tag = match
+      ? `<span class="pmatch">→ ${esc(match.nm)}</span>`
+      : `<span class="pmatch new">uusi</span>`;
+    return `<div class="prow">
+      <input type="checkbox" ${r.sel ? "checked" : ""} onchange="currentPhoto.items[${i}].sel=this.checked" aria-label="Valitse rivi">
+      <input class="pnm" value="${esc(r.nm)}" onchange="currentPhoto.items[${i}].nm=this.value" aria-label="Tuotenimi">
+      <input class="ppr" inputmode="decimal" value="${String(r.pr).replace(".",",")}" onchange="currentPhoto.items[${i}].pr=parseFloat(this.value.replace(',','.'))||0" aria-label="Hinta">
+      ${tag}
+    </div>`;
+  }).join("");
+  el.innerHTML = `
+    <div class="h2">Luetut tuotteet — tarkista ja korjaa</div>
+    <div class="panel">${rows}
+      <button class="addrow" onclick="addParsedRow()">＋ Lisää rivi käsin</button>
+    </div>
+    <button class="ocrbtn" style="margin-top:12px" onclick="applyParsed()">${ic('cart')} Vie valitut kauppalistaan</button>
+    <div class="ocrhint">”→ nimi” tarkoittaa, että rivi päivittää olemassa olevan tuotteen hinnan.<br>”uusi” lisätään listalle uutena tuotteena.<br>Hinnat päivittävät myös ruoka-ainekirjaston hinnan, jos tuote löytyy sieltä ja sille on tallennettu pakkauskoko.</div>`;
+}
+
+function addParsedRow(){
+  currentPhoto.items.push({ nm: "", pr: 0, sel: true });
+  renderParsed();
+}
+
+async function applyParsed(){
+  if (!currentPhoto) return;
+  let added = 0, updated = 0, foodUpdated = 0;
+  for (const r of currentPhoto.items){
+    if (!r.sel || !r.nm.trim() || !(r.pr > 0)) continue;
+    const fm = findFoodMatch(r.nm);
+    // Kauppalista: päivitä hinta tai lisää uusi tuote
+    const match = findShopMatch(r.nm);
+    if (match){ match.pr = r.pr; updated++; }
+    else { state.shop.push({ id: uid(), nm: r.nm.trim(), dt: "", pr: r.pr, q: 1, done: false, cat: fm ? (fm.cat || "muut") : "muut" }); added++; }
+    // Ruoka-ainekirjasto: päivitä pakkaushinta + €/100 g jos pakkauskoko tiedossa
+    if (fm && fm.pkg && fm.pkg.grams > 0){
+      fm.pkg.price = r.pr;
+      fm.price = Math.round(r.pr / (fm.pkg.grams / 100) * 100) / 100;
+      foodUpdated++;
+    }
+  }
+  save();
+  await dbPut(currentPhoto);
+  showTab("shop");
+  let msg = `Kauppalista: ${added} uutta, ${updated} päivitetty`;
+  if (foodUpdated) msg += ` · Kirjaston hinnat: ${foodUpdated} päivitetty`;
+  toast(msg);
+}
+
+// ============ MODAALIT ============
+const overlay = document.getElementById("overlay");
+const sheet = document.getElementById("sheet");
+function closeModal(){ overlay.classList.remove("show"); }
+let _toastT = null;
+function toast(msg){
+  const el = document.getElementById("toast");
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add("show");
+  if (_toastT) clearTimeout(_toastT);
+  _toastT = setTimeout(() => el.classList.remove("show"), 2800);
+}
+function val(id){ return document.getElementById(id).value.trim(); }
+function num(id){ return parseFloat(val(id).replace(",", ".")) || 0; }
+
+// --- Ateria ---
+const EMOJIS = MEAL_ICONS;
+let pickedEmoji = EMOJIS[0];
+
+function openMealModal(editId){
+  const m = editId ? state.meals.find(x => x.id === editId) : null;
+  pickedEmoji = m ? normIcon(m.emoji) : EMOJIS[0];
+  sheet.innerHTML = `
+    <h3>${m ? "Muokkaa ateriaa" : "Uusi ateria"}</h3>
+    <div class="field"><label for="f-name">Aterian nimi</label>
+      <input id="f-name" value="${m ? esc(m.name) : ""}" placeholder="esim. Aamupala" maxlength="40"></div>
+    <div class="field"><label>Kuvake</label>
+      <div class="emojirow">${EMOJIS.map(e =>
+        `<button class="emoji-opt ${e===pickedEmoji?"sel":""}" onclick="pickEmoji(this,'${e}')">${ICONS[e]}</button>`).join("")}</div></div>
+    <div class="btnrow">
+      <button class="btn ghost" onclick="closeModal()">Peruuta</button>
+      <button class="btn primary" onclick="saveMeal(${m ? `'${m.id}'` : "null"})">${m ? "Tallenna" : "Luo ateria"}</button>
+    </div>
+    ${m ? `<button class="btn danger" onclick="deleteMeal('${m.id}')">Poista ateria</button>` : ""}`;
+  overlay.classList.add("show");
+  if (!m) setTimeout(() => document.getElementById("f-name").focus(), 100);
+}
+function pickEmoji(btn, e){
+  pickedEmoji = e;
+  sheet.querySelectorAll(".emoji-opt").forEach(b => b.classList.remove("sel"));
+  btn.classList.add("sel");
+}
+function saveMeal(editId){
+  const name = val("f-name");
+  if (!name) { document.getElementById("f-name").focus(); return; }
+  if (editId){
+    const m = state.meals.find(x => x.id === editId);
+    m.name = name; m.emoji = pickedEmoji;
+  } else {
+    const id = uid();
+    state.meals.push({ id, name, emoji: pickedEmoji, items: [] });
+    save(); closeModal(); renderAll(); openDetail(id); return;
+  }
+  save(); closeModal(); renderAll();
+  if (currentMeal) renderDetail();
+}
+function deleteMeal(id){
+  state.meals = state.meals.filter(m => m.id !== id);
+  // siivoa kirjaukset, jotka viittasivat poistettuun pohjaan
+  for (const k of Object.keys(state.log)){
+    state.log[k] = state.log[k].filter(e => e.mealId !== id);
+    if (!state.log[k].length) delete state.log[k];
+  }
+  save(); closeModal();
+  if (currentMeal === id){ currentMeal = null; showTab("meals"); }
+  renderAll();
+}
+
+// --- Ruoka-aine ---
+function openFoodModal(editId, prefill){
+  const f = editId ? food(editId) : null;
+  const v = f || prefill || {};
+  const barcode = (f && f.barcode) || (prefill && prefill.barcode) || "";
+  let banner = "";
+  if (prefill && prefill.already) banner = `<div class="hint" style="background:var(--accent-soft);color:var(--accent);padding:10px;border-radius:10px;margin-bottom:13px">Tämä tuote on jo kirjastossasi — tässä sen tiedot.</div>`;
+  else if (prefill && prefill.notFound) banner = `<div class="hint" style="background:var(--warn-bg);color:var(--warn-ink);padding:10px;border-radius:10px;margin-bottom:13px">Viivakoodi ${esc(barcode)} ei löytynyt tietokannasta. Täytä tiedot käsin — koodi tallentuu silti tuotteeseen.</div>`;
+  else if (prefill && prefill.offline) banner = `<div class="hint" style="background:var(--warn-bg);color:var(--warn-ink);padding:10px;border-radius:10px;margin-bottom:13px">Tuotetietoja ei voitu hakea (ei verkkoyhteyttä). Täytä tiedot käsin — koodi ${esc(barcode)} tallentuu tuotteeseen.</div>`;
+  else if (prefill && prefill.barcode) banner = `<div class="hint" style="background:var(--accent-soft);color:var(--accent);padding:10px;border-radius:10px;margin-bottom:13px">Tuote löytyi tietokannasta — tarkista arvot ja lisää hinta.</div>`;
+  sheet.innerHTML = `
+    <h3>${f ? "Muokkaa ruoka-ainetta" : "Uusi ruoka-aine"}</h3>
+    ${banner}
+    ${!f ? `<button class="ocrbtn" style="margin-bottom:14px;background:var(--soft);color:var(--ink)" onclick="closeModal();startScanner()">${ic('camera')} Skannaa viivakoodi</button>` : ""}
+    <div class="field"><label for="fo-name">Nimi</label>
+      <input id="fo-name" value="${v.name != null ? esc(String(v.name)) : ""}" placeholder="esim. Tonnikala" maxlength="60"></div>
+    <div class="field"><label>Ravintoarvot / 100 g</label>
+      <div class="grid4">
+        <input id="fo-kcal" inputmode="decimal" placeholder="kcal" value="${v.kcal != null ? v.kcal : ""}" aria-label="kcal">
+        <input id="fo-p" inputmode="decimal" placeholder="P g" value="${v.p != null ? v.p : ""}" aria-label="Proteiini">
+        <input id="fo-h" inputmode="decimal" placeholder="H g" value="${v.h != null ? v.h : ""}" aria-label="Hiilihydraatit">
+        <input id="fo-r" inputmode="decimal" placeholder="R g" value="${v.r != null ? v.r : ""}" aria-label="Rasva">
+      </div></div>
+    <div class="field"><label for="fo-price">Hinta € / 100 g</label>
+      <input id="fo-price" inputmode="decimal" value="${f ? f.price : ""}" placeholder="esim. 0,74">
+      <div class="hint">Käytetään aterioiden hintalaskelmissa. Voit jättää tyhjäksi, jos täytät pakkaustiedot alla — hinta lasketaan niistä.</div></div>
+    <div class="field"><label>Pakkaus kaupassa (valinnainen)</label>
+      <div class="prow" style="margin-bottom:6px">
+        <div class="pf"><input id="fo-pkgsize" inputmode="decimal" value="${f && f.pkg ? f.pkg.grams : ""}" placeholder="koko, g"></div>
+        <div class="pf"><input id="fo-pkgprice" inputmode="decimal" value="${f && f.pkg ? f.pkg.price : ""}" placeholder="hinta, €"></div>
+      </div>
+      <input id="fo-pkglabel" value="${f && f.pkg ? esc(f.pkg.label) : ""}" placeholder='merkintä, esim. "400 g rasia"' maxlength="30">
+      <div class="hint">Kun teet kauppalistan aterioista, tarve pyöristetään näiksi pakkauksiksi. Esim. 400 g rasia · 2,95 €.</div></div>
+    <div class="field"><label for="fo-barcode">Viivakoodi (valinnainen)</label>
+      <input id="fo-barcode" inputmode="numeric" value="${esc(barcode)}" placeholder="skannaamalla tai käsin"></div>
+    <details class="extsec">
+      <summary>Tarkemmat ravintoarvot / 100 g (valinnainen)</summary>
+      <div class="extbody">${extFieldsHtml(f || prefill)}</div>
+    </details>
+    <div class="btnrow">
+      <button class="btn ghost" onclick="closeModal()">Peruuta</button>
+      <button class="btn primary" onclick="saveFood(${f ? `'${f.id}'` : "null"})">Tallenna</button>
+    </div>
+    ${f ? `<button class="btn danger" onclick="deleteFood('${f.id}')">Poista ruoka-aine</button>` : ""}`;
+  overlay.classList.add("show");
+  if (!f && !(prefill && prefill.barcode)) setTimeout(() => document.getElementById("fo-name").focus(), 100);
+}
+function extFieldsHtml(src){
+  const ext = (src && src.ext) || {};
+  let html = "";
+  for (const [gkey, glabel] of EXT_GROUPS){
+    const nutrients = EXT_NUTRIENTS.filter(x => x[3] === gkey);
+    html += `<div class="extsub">${glabel}</div><div class="extgrid">`;
+    html += nutrients.map(([k,label,unit]) =>
+      `<input id="ext-${k}" inputmode="decimal" placeholder="${label} (${unit})" value="${ext[k] != null ? ext[k] : ""}">`).join("");
+    html += `</div>`;
+  }
+  return html;
+}
+function saveFood(editId){
+  const name = val("fo-name");
+  if (!name){ document.getElementById("fo-name").focus(); return; }
+  const barcode = val("fo-barcode");
+  const pkgSize = num("fo-pkgsize"), pkgPrice = num("fo-pkgprice"), pkgLabel = val("fo-pkglabel");
+  let price = num("fo-price");
+  // Johda €/100 g pakkauksesta, jos hinta jätettiin tyhjäksi
+  if ((!price || price === 0) && pkgSize > 0 && pkgPrice > 0){
+    price = Math.round(pkgPrice / (pkgSize/100) * 100) / 100;
+  }
+  const pkg = (pkgSize > 0 && pkgPrice > 0) ? { grams: pkgSize, price: pkgPrice, label: pkgLabel || (pkgSize + " g") } : null;
+  // Kerää tarkemmat ravintoarvot (vain täytetyt)
+  const ext = {};
+  for (const [k] of EXT_NUTRIENTS){
+    const el = document.getElementById("ext-" + k);
+    if (el && el.value.trim() !== ""){
+      const v = parseFloat(el.value.replace(",", "."));
+      if (!isNaN(v)) ext[k] = v;
+    }
+  }
+  const data = { name, kcal: num("fo-kcal"), p: num("fo-p"), h: num("fo-h"), r: num("fo-r"), price, barcode: barcode || "", pkg, ext };
+  let newId = null;
+  if (editId) Object.assign(food(editId), data);
+  else { newId = uid(); state.foods.push({ id: newId, ...data }); }
+  save(); closeModal(); renderAll();
+  if (document.getElementById("page-protein").classList.contains("active")) renderProteinValue();
+  // Jos skannattu uusi tuote ja ollaan ateriassa, lisätään se suoraan ateriaan
+  if (newId && currentMeal){
+    const m = state.meals.find(x => x.id === currentMeal);
+    if (m){ m.items.push({ foodId: newId, grams: state.profile.defaultGrams || 100 }); save(); }
+  }
+  if (currentMeal) renderDetail();
+}
+function deleteFood(id){
+  const used = state.meals.some(m => m.items.some(it => it.foodId === id));
+  if (used){
+    alert("Ruoka-aine on käytössä ateriassa. Poista se ensin aterioista.");
+    return;
+  }
+  state.foods = state.foods.filter(f => f.id !== id);
+  save(); closeModal();
+  if (document.getElementById("page-protein").classList.contains("active")) renderProteinValue();
+  if (currentMeal) renderDetail();
+}
+
+// --- Kauppalistan tuote ---
+function openShopModal(editId){
+  const it = editId ? state.shop.find(x => x.id === editId) : null;
+  const curCat = (it && it.cat) || "muut";
+  const catOpts = SHOP_CATS.map(([k,l]) => `<option value="${k}" ${k===curCat?"selected":""}>${l}</option>`).join("");
+  sheet.innerHTML = `
+    <h3>${it ? "Muokkaa tuotetta" : "Uusi tuote"}</h3>
+    <div class="field"><label for="s-name">Tuotteen nimi</label>
+      <input id="s-name" value="${it ? esc(it.nm) : ""}" placeholder="esim. Kanajauheliha 5 %" maxlength="60"></div>
+    <div class="field"><label for="s-note">Lisätieto (valinnainen)</label>
+      <input id="s-note" value="${it ? esc(it.dt) : ""}" placeholder="esim. 400 g pakkaus" maxlength="60"></div>
+    <div class="grid2">
+      <div class="field"><label for="s-price">Hinta € / kpl</label>
+        <input id="s-price" inputmode="decimal" value="${it ? it.pr : ""}" placeholder="esim. 2,95"></div>
+      <div class="field"><label for="s-qty">Määrä</label>
+        <input id="s-qty" inputmode="numeric" value="${it ? it.q : 1}"></div>
+    </div>
+    <div class="field"><label for="s-cat">Osasto</label>
+      <select id="s-cat" class="sel">${catOpts}</select></div>
+    <div class="btnrow">
+      <button class="btn ghost" onclick="closeModal()">Peruuta</button>
+      <button class="btn primary" onclick="saveShop(${it ? `'${it.id}'` : "null"})">Tallenna</button>
+    </div>
+    ${it ? `<button class="btn danger" onclick="deleteShop('${it.id}')">Poista tuote</button>` : ""}`;
+  overlay.classList.add("show");
+  if (!it) setTimeout(() => document.getElementById("s-name").focus(), 100);
+}
+function saveShop(editId){
+  const nm = val("s-name");
+  if (!nm){ document.getElementById("s-name").focus(); return; }
+  const catEl = document.getElementById("s-cat");
+  const data = { nm, dt: val("s-note"), pr: num("s-price"), q: Math.max(0, Math.round(num("s-qty"))), cat: catEl ? catEl.value : "muut" };
+  if (editId) Object.assign(state.shop.find(x => x.id === editId), data);
+  else state.shop.push({ id: uid(), ...data, done: false });
+  save(); closeModal(); renderShop();
+}
+function deleteShop(id){
+  state.shop = state.shop.filter(x => x.id !== id);
+  save(); closeModal(); renderShop();
+}
+
+// --- Profiili ---
+function computeTargets(p){
+  const bmr = 10*p.weight + 6.25*p.height - 5*p.age + (p.sex === "female" ? -161 : 5);
+  const act = { light:1.375, moderate:1.55, active:1.725 }[p.activity] || 1.55;
+  const goalAdj = { lose:-0.18, maintain:0, gain:0.12 }[p.goal] || 0;
+  let kcal = Math.round((bmr * act * (1 + goalAdj)) / 10) * 10;
+  if (kcal < 0) kcal = 0;
+  const protein = Math.round(p.proteinPerKg * p.weight);
+  const fat = Math.round(0.9 * p.weight);
+  const carbs = Math.max(0, Math.round((kcal - protein*4 - fat*9) / 4));
+  return { kcal, p: protein, h: carbs, r: fat };
+}
+
+function applyCalculated(){
+  if (state.profile.useCalculated){
+    state.targets = computeTargets(state.profile);
+  }
+}
+
+function openProfile(){ showTab("profile"); }
+function openSettings(){ showTab("profile"); }   // varmuuden vuoksi, jos jokin kutsuu
+
+function renderProfile(){
+  const p = state.profile;
+  const calc = computeTargets(p);
+  const lbStale = !p.lastBackup || (Date.now() - p.lastBackup) / 86400000 >= 21;
+  const lbTxt = p.lastBackup ? "Viimeksi: " + new Date(p.lastBackup).toLocaleDateString("fi-FI") : "Ei vielä varmuuskopioitu";
+  const seg = (field, opts) => `<div class="seg">${opts.map(([val,lbl]) =>
+    `<button class="${p[field]===val?"on":""}" onclick="setProfile('${field}','${val}')">${lbl}</button>`).join("")}</div>`;
+
+  let targetsBlock;
+  if (p.useCalculated){
+    targetsBlock = `
+      <div class="calc">
+        <div class="clbl">Suositeltu päivätavoite</div>
+        <div class="cbig" id="calc-kcal">${calc.kcal.toLocaleString("fi-FI")} kcal</div>
+        <div class="cmac">
+          <div class="cmc"><div class="v" id="calc-p">${calc.p} g</div><div class="l">proteiini</div></div>
+          <div class="cmc"><div class="v" id="calc-h">${calc.h} g</div><div class="l">hiilarit</div></div>
+          <div class="cmc"><div class="v" id="calc-r">${calc.r} g</div><div class="l">rasva</div></div>
+        </div>
+      </div>
+      <div class="pcard" style="margin-top:10px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600">
+          <span>Proteiinitavoite</span><span style="color:var(--accent-2)" id="pk-label">${p.proteinPerKg.toFixed(1).replace(".",",")} g / painokilo</span></div>
+        <input class="prange" type="range" min="1.6" max="2.2" step="0.1" value="${p.proteinPerKg}"
+               oninput="liveProtein(parseFloat(this.value))" aria-label="Proteiinia per painokilo">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>1,6 g/kg</span><span>2,2 g/kg</span></div>
+      </div>`;
+  } else {
+    const g = state.targets;
+    targetsBlock = `
+      <div class="pcard">
+        <div class="prow">
+          <div class="pf"><label>Energia (kcal)</label><input id="t-kcal" inputmode="numeric" value="${g.kcal}" onchange="saveManualTargets()"></div>
+          <div class="pf"><label>Proteiini (g)</label><input id="t-p" inputmode="numeric" value="${g.p}" onchange="saveManualTargets()"></div>
+        </div>
+        <div class="prow" style="margin-bottom:0">
+          <div class="pf"><label>Hiilihydraatit (g)</label><input id="t-h" inputmode="numeric" value="${g.h}" onchange="saveManualTargets()"></div>
+          <div class="pf"><label>Rasva (g)</label><input id="t-r" inputmode="numeric" value="${g.r}" onchange="saveManualTargets()"></div>
+        </div>
+      </div>
+      <div class="hint" style="margin:8px 4px 0">Tai ota kytkin käyttöön, niin tavoitteet lasketaan tiedoistasi automaattisesti.</div>`;
+  }
+
+  const initial = (p.name && p.name.trim()) ? esc(p.name.trim()[0].toUpperCase()) : ICONS.person;
+  const goalLbl = { lose:"Painonpudotus", maintain:"Ylläpito", gain:"Lihasmassan kasvatus" }[p.goal] || "";
+  const startTab = p.startTab || "today";
+  const tabOpts = [["today","Tänään"],["meals","Ateriat"],["shop","Kauppa"],["photos","Kuvat"]]
+    .map(([k,l]) => `<option value="${k}" ${k===startTab?"selected":""}>${l}</option>`).join("");
+
+  document.getElementById("profile-body").innerHTML = `
+    <div class="phead">
+      <div class="pavatar">${initial}</div>
+      <div class="pmeta">
+        <input class="pname" value="${esc(p.name||"")}" placeholder="Nimesi" maxlength="30" onchange="setProfile('name', this.value.trim())">
+        <div class="psub">${goalLbl} · ${state.targets.kcal.toLocaleString("fi-FI")} kcal/pv</div>
+      </div>
+    </div>
+
+    <div class="pcard plist" style="padding:0">
+      <button class="pli" onclick="openProgress()"><div class="pic">${ICONS.chart}</div><div class="plt"><div class="pl1">Edistyminen</div><div class="pl2">Paino ja saannin trendit</div></div><div class="pchev">›</div></button>
+      <button class="pli" onclick="openProteinValue()"><div class="pic">${ICONS.euro}</div><div class="plt"><div class="pl1">Edullisin proteiini</div><div class="pl2">Ruoka-aineet proteiini/€ -järjestyksessä</div></div><div class="pchev">›</div></button>
+    </div>
+
+    <div class="h2">OMAT TIEDOT</div>
+    <div class="pcard">
+      <div class="prow">
+        <div class="pf"><label>Paino (kg)</label><input inputmode="decimal" value="${p.weight}" onchange="setProfile('weight', parseFloat(this.value.replace(',','.'))||0)"></div>
+        <div class="pf"><label>Pituus (cm)</label><input inputmode="numeric" value="${p.height}" onchange="setProfile('height', parseFloat(this.value.replace(',','.'))||0)"></div>
+        <div class="pf"><label>Ikä</label><input inputmode="numeric" value="${p.age}" onchange="setProfile('age', parseInt(this.value)||0)"></div>
+      </div>
+      <div class="pf" style="margin-bottom:12px"><label>Sukupuoli</label>${seg("sex",[["male","Mies"],["female","Nainen"]])}</div>
+      <div class="pf" style="margin-bottom:12px"><label>Aktiivisuus</label>${seg("activity",[["light","Kevyt"],["moderate","Kohtalainen"],["active","Aktiivinen"]])}</div>
+      <div class="pf"><label>Tavoite</label>${seg("goal",[["lose","Pudota"],["maintain","Ylläpidä"],["gain","Kasvata"]])}</div>
+    </div>
+
+    <div class="h2">TAVOITTEET</div>
+    <div class="toggle" style="margin-bottom:10px">
+      <div><div class="tt">Käytä laskettuja tavoitteita</div><div class="ts">Pois päältä = syötä kcal ja makrot itse</div></div>
+      <button class="sw ${p.useCalculated?"on":""}" role="switch" aria-checked="${p.useCalculated}" aria-label="Käytä laskettuja tavoitteita" onclick="toggleCalculated()"></button>
+    </div>
+    ${targetsBlock}
+
+    <div class="h2">ASETUKSET</div>
+    <div class="toggle" style="margin-bottom:10px">
+      <div><div class="tt">Tumma tila</div><div class="ts">Tumma ulkoasu koko sovellukselle</div></div>
+      <button class="sw ${p.dark?"on":""}" role="switch" aria-checked="${p.dark}" aria-label="Tumma tila" onclick="toggleDark()"></button>
+    </div>
+    <div class="pcard" style="margin-bottom:10px">
+      <div class="prow" style="margin-bottom:0;align-items:center">
+        <div class="pf" style="flex:2"><label>Aloitusnäkymä</label>
+          <select onchange="setProfile('startTab', this.value)">${tabOpts}</select></div>
+        <div class="pf"><label>Oletusmäärä (g)</label>
+          <input inputmode="numeric" value="${p.defaultGrams || 100}" onchange="setProfile('defaultGrams', Math.max(1, parseInt(this.value)||100))"></div>
+      </div>
+      <div class="prow" style="margin:10px 0 0">
+        <div class="pf"><label>Vesitavoite (l)</label>
+          <input inputmode="decimal" value="${((p.waterTarget||2500)/1000).toString().replace('.',',')}" onchange="setWaterTarget(this.value)"></div>
+        <div class="pf"><label>Askeltavoite</label>
+          <input inputmode="numeric" value="${p.stepGoal||10000}" onchange="setProfile('stepGoal', Math.max(0, parseInt(this.value)||10000))"></div>
+      </div>
+      <div class="hint" style="margin-top:8px">Oletusmäärä on annos, joka asetetaan kun lisäät ruoka-aineen ateriaan. Vesitavoite ohjaa Tänään-välilehden vesimittaria.</div>
+    </div>
+    <div class="pcard plist" style="padding:0">
+      <button class="pli" onclick="clearPhotos()"><div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 16l-5-5L4 19.5"/></svg></div><div class="plt"><div class="pl1">Kuvien hallinta</div><div class="pl2" id="photo-count">Lasketaan…</div></div><div class="pchev">›</div></button>
+    </div>
+
+    <div class="h2">TIEDOT &amp; VARMUUSKOPIO</div>
+    <div class="pcard plist" style="padding:0">
+      <button class="pli" onclick="exportBackup()"><div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19.5V5M12 5l-5 5M12 5l5 5"/></svg></div><div class="plt"><div class="pl1">Vie varmuuskopio</div><div class="pl2"${lbStale ? ' style="color:var(--warn-ink)"' : ''}>${lbTxt}</div></div><div class="pchev">›</div></button>
+      <button class="pli" onclick="document.getElementById('backup-file').click()"><div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5V19M12 19l-5-5M12 19l5-5"/></svg></div><div class="plt"><div class="pl1">Tuo varmuuskopio</div><div class="pl2">Palauta tiedot tiedostosta</div></div><div class="pchev">›</div></button>
+      <button class="pli danger" onclick="resetAll()"><div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16M9 6.5V4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6.5 6.5l1 13a1.5 1.5 0 0 0 1.5 1.4h6a1.5 1.5 0 0 0 1.5-1.4l1-13M10 11v6M14 11v6"/></svg></div><div class="plt"><div class="pl1">Tyhjennä kaikki tiedot</div><div class="pl2">Ateriat, kirjaukset, kauppalista</div></div><div class="pchev">›</div></button>
+    </div>
+    <div class="pstatus" id="profile-status"></div>
+    <div class="note">Kaikki tiedot tallentuvat vain tälle laitteelle.<br>Makrolista · versio 1.0</div>`;
+  updatePhotoCount();
+}
+async function updatePhotoCount(){
+  const el = document.getElementById("photo-count");
+  if (!el) return;
+  try {
+    const photos = await dbAll();
+    el.textContent = photos.length ? `${photos.length} kuvaa tallessa · poista kaikki` : "Ei tallennettuja kuvia";
+  } catch(e){ el.textContent = "Kuvien tallennus ei käytettävissä"; }
+}
+
+function setProfile(field, value){
+  state.profile[field] = value;
+  applyCalculated();
+  save();
+  renderProfile();
+  renderToday();
+}
+function applyTheme(){
+  const dark = !!(state.profile && state.profile.dark);
+  document.documentElement.classList.toggle("dark", dark);
+  // iOS Safari ei aina piirrä juuritaustaa uudelleen luokan vaihtuessa ajon aikana;
+  // pakotetaan se asettamalla tausta suoraan inline-tyylinä.
+  const bg = dark ? "#0E100D" : "#F4F5F1";
+  document.documentElement.style.backgroundColor = bg;
+  document.body.style.backgroundColor = bg;
+  const tc = document.querySelector('meta[name="theme-color"]');
+  if (tc) tc.setAttribute("content", bg);
+}
+function toggleDark(){
+  state.profile.dark = !state.profile.dark;
+  save(); applyTheme(); renderProfile();
+}
+async function dbClearAll(){
+  const db = await idb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction("photos", "readwrite");
+    tx.objectStore("photos").clear();
+    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+  });
+}
+function clearPhotos(){
+  confirmSheet("Poistetaanko kaikki kuvat?", "Poistaa kaikki tallennetut kuvat laitteelta. Tätä ei voi perua.", "Poista kuvat", true, async () => {
+    try { await dbClearAll(); } catch(e){}
+    pStatus("Kuvat poistettu.");
+    renderProfile(); renderPhotos();
+  });
+}
+function toggleCalculated(){
+  state.profile.useCalculated = !state.profile.useCalculated;
+  applyCalculated();
+  save();
+  renderProfile();
+  renderToday();
+}
+function liveProtein(v){
+  state.profile.proteinPerKg = v;
+  applyCalculated(); save(); renderToday();
+  const calc = computeTargets(state.profile);
+  const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  set("pk-label", v.toFixed(1).replace(".",",") + " g / painokilo");
+  set("calc-kcal", calc.kcal.toLocaleString("fi-FI") + " kcal");
+  set("calc-p", calc.p + " g");
+  set("calc-h", calc.h + " g");
+  set("calc-r", calc.r + " g");
+}
+function saveManualTargets(){
+  state.targets = {
+    kcal: Math.max(0, Math.round(num("t-kcal"))),
+    p: Math.max(0, Math.round(num("t-p"))),
+    h: Math.max(0, Math.round(num("t-h"))),
+    r: Math.max(0, Math.round(num("t-r"))),
+  };
+  save(); renderToday();
+}
+function pStatus(msg){
+  const el = document.getElementById("profile-status");
+  if (el) el.textContent = msg || "";
+}
+
+// --- Varmuuskopio ---
+function exportBackup(){
+  try {
+    const data = JSON.stringify(state, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "makrolista-varmuuskopio-" + dateKey(new Date()) + ".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    state.profile.lastBackup = Date.now();
+    state.profile.backupSnooze = 0;
+    save();
+    pStatus("Varmuuskopio ladattu. (Kuvat eivät sisälly varmuuskopioon.)");
+    toast("Varmuuskopio ladattu.");
+    if (document.getElementById("page-today").classList.contains("active")) renderToday();
+    if (document.getElementById("page-profile").classList.contains("active")) renderProfile();
+  } catch(e){ pStatus("Vienti epäonnistui."); toast("Vienti epäonnistui."); }
+}
+// Onko varmuuskopio vanhentunut? (dataa on, eikä torkutettu, eikä varmuuskopioitu 21 vrk:een)
+function backupStale(){
+  const p = state.profile;
+  const hasData = (state.meals && state.meals.length) || Object.keys(state.log||{}).length ||
+                  (state.shop && state.shop.length) || Object.keys(state.weights||{}).length;
+  if (!hasData) return false;
+  const now = Date.now();
+  if (p.backupSnooze && now < p.backupSnooze) return false;
+  if (!p.lastBackup) return true;
+  return (now - p.lastBackup) / 86400000 >= 21;
+}
+function snoozeBackup(){
+  state.profile.backupSnooze = Date.now() + 7*86400000;
+  save(); renderToday();
+}
+function backupBannerHTML(){
+  return `<div class="bkbanner">
+    <div class="bk-row">
+      <span class="bk-ic">${ICONS.shield}</span>
+      <div class="bk-txt"><b>Muista varmuuskopio</b><span>Tiedot ovat vain tällä laitteella. Selaimen tyhjennys poistaisi ne.</span></div>
+      <button class="bk-x" onclick="snoozeBackup()" aria-label="Muistuta myöhemmin">✕</button>
+    </div>
+    <button class="bk-btn" onclick="exportBackup()">Varmuuskopioi nyt</button>
+  </div>`;
+}
+document.getElementById("backup-file").addEventListener("change", e => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try { data = JSON.parse(reader.result); } catch(err){ pStatus("Tiedoston luku epäonnistui."); return; }
+    if (!data || !Array.isArray(data.foods) || !Array.isArray(data.meals)){
+      pStatus("Tämä ei näytä Makrolistan varmuuskopiolta."); return;
+    }
+    confirmSheet("Tuo varmuuskopio?", "Tämä korvaa nykyiset ateriat, ruoka-aineet, kauppalistan, kirjaukset ja tavoitteet tiedoston tiedoilla.", "Tuo ja korvaa", true, () => {
+      state = data;
+      if (!state.log) state.log = {};
+      if (!state.profile) state.profile = freshState().profile;
+      if (!state.water) state.water = {};
+      if (!state.weights) state.weights = {};
+      if (state.profile.waterTarget === undefined) state.profile.waterTarget = 2500;
+    if (state.profile.stepGoal === undefined) state.profile.stepGoal = 10000;
+    if (!state.steps) state.steps = {};
+      save(); currentMeal = null; renderAll(); renderProfile();
+      pStatus("Varmuuskopio tuotu onnistuneesti.");
+    });
+  };
+  reader.readAsText(file);
+});
+function resetAll(){
+  confirmSheet("Tyhjennetäänkö kaikki tiedot?", "Poistaa ateriat, ruoka-aineet, kauppalistan, kirjaukset ja tavoitteet. Kuvat säilyvät. Tätä ei voi perua.", "Tyhjennä", true, () => {
+    state = freshState();
+    save(); currentMeal = null; showTab("today");
+  });
+}
+
+// Yleinen vahvistusmodaali (toimii myös esikatselussa, ei nojaa confirm()-ikkunaan)
+function confirmSheet(title, msg, yesLabel, danger, onYes){
+  window._confirmYes = onYes;
+  sheet.innerHTML = `
+    <h3>${esc(title)}</h3>
+    <div class="hint" style="margin-bottom:4px">${esc(msg)}</div>
+    <div class="btnrow">
+      <button class="btn ghost" onclick="closeModal()">Peruuta</button>
+      <button class="btn ${danger?"primary":"primary"}" ${danger?'style="background:var(--danger)"':''} onclick="(window._confirmYes||function(){})();window._confirmYes=null;closeModal()">${esc(yesLabel)}</button>
+    </div>`;
+  overlay.classList.add("show");
+}
+
+// ============ NAVIGAATIO ============
+let lastTab = "today";
+const FAB_LABELS = { today: "＋ Kirjaa", meals: "＋ Lisää ateria", shop: "＋ Lisää tuote", photos: "＋ Uusi kuva" };
+
+function showTab(tab){
+  lastTab = tab;
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-" + tab).classList.add("active");
+  document.querySelectorAll(".nv").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+  const fab = document.getElementById("fab");
+  if (tab === "profile"){
+    fab.classList.remove("show");
+    renderProfile();
+  } else {
+    fab.textContent = FAB_LABELS[tab];
+    fab.classList.add("show");
+  }
+  renderAll();
+  window.scrollTo(0,0);
+}
+function fabAction(){
+  if (lastTab === "shop") openShopModal();
+  else if (lastTab === "photos") openPhotoSource();
+  else if (lastTab === "today") openLogPicker();
+  else openMealModal();
+}
+
+function openPhotoSource(){
+  sheet.innerHTML = `
+    <h3>Lisää kuva</h3>
+    <button class="ocrbtn" onclick="closeModal();document.getElementById('cam').click()">${ic('camera')} Ota kuva</button>
+    <button class="ocrbtn" style="margin-top:10px;background:var(--soft);color:var(--ink)" onclick="closeModal();document.getElementById('gal').click()">${ic('image')} Valitse galleriasta</button>
+    <div class="hint" style="text-align:center;margin-top:12px">Galleriasta voit valita useita kuvia kerralla.</div>
+    <button class="btn ghost" style="margin-top:16px;width:100%" onclick="closeModal()">Peruuta</button>`;
+  overlay.classList.add("show");
+}
+
+document.getElementById("cam").addEventListener("change", e => {
+  const f = e.target.files && e.target.files[0];
+  if (f) capturePhoto(f);
+  e.target.value = "";
+});
+
+document.getElementById("gal").addEventListener("change", async e => {
+  const files = Array.from(e.target.files || []);
+  e.target.value = "";
+  if (!files.length) return;
+  if (files.length === 1){ capturePhoto(files[0]); return; }
+  // Useita kuvia: tallenna kaikki, jää galleriaan
+  for (const f of files){
+    const blob = await downscale(f);
+    await dbPut({ id: uid(), ts: Date.now(), note: "", blob, text: null, items: [] });
+  }
+  showTab("photos");
+});
+
+function renderAll(){
+  renderToday();
+  renderMeals();
+  renderShop();
+  renderPhotos();
+}
+
+// ============ VIIVAKOODISKANNAUS ============
+let scanState = { active:false, stream:null, reader:null, raf:0, _handling:false };
+
+function scanStatus(msg){
+  const el = document.getElementById("scan-status");
+  if (!msg){ el.classList.remove("show"); return; }
+  el.textContent = msg; el.classList.add("show");
+}
+
+// Aloita skannaus: avaa kamera, tunnista viivakoodi → onBarcode
+async function startScanner(){
+  // Esitarkistus: kamera vaatii suojatun yhteyden ja mediaDevices-tuen
+  if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    openManualBarcode("Kamera ei ole käytettävissä tässä ympäristössä. Se vaatii https-yhteyden ja kameraluvan — esikatselussa tai suoraan tiedostosta avattuna kamera ei käynnisty. Voit silti hakea tuotteen syöttämällä viivakoodin numerot.");
+    return;
+  }
+  const scr = document.getElementById("scanner");
+  const video = document.getElementById("scan-video");
+  scr.classList.add("show"); scr.setAttribute("aria-hidden","false");
+  scanState.active = true; scanState._handling = false;
+  scanStatus("Käynnistetään kameraa…");
+  try {
+    if ("BarcodeDetector" in window){
+      let formats = ["ean_13","ean_8","upc_a","upc_e","code_128"];
+      try {
+        const supported = await BarcodeDetector.getSupportedFormats();
+        const f = formats.filter(x => supported.includes(x));
+        if (f.length) formats = f; else formats = supported;
+      } catch(e){}
+      const detector = new BarcodeDetector({ formats });
+      scanState.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      video.srcObject = scanState.stream;
+      await video.play();
+      watchCamera(video);
+      const loop = async () => {
+        if (!scanState.active) return;
+        try {
+          const codes = await detector.detect(video);
+          if (codes && codes.length){ onBarcode(codes[0].rawValue); return; }
+        } catch(e){}
+        scanState.raf = requestAnimationFrame(loop);
+      };
+      scanState.raf = requestAnimationFrame(loop);
+    } else {
+      // Varalla ZXing (mm. iOS Safari)
+      scanStatus("Ladataan skanneria…");
+      await loadZXing();
+      scanStatus("Käynnistetään kameraa…");
+      scanState.reader = new ZXing.BrowserMultiFormatReader();
+      await scanState.reader.decodeFromVideoDevice(null, video, (result) => {
+        if (result && scanState.active) onBarcode(result.getText());
+      });
+      watchCamera(video);
+    }
+  } catch(e){
+    stopScanner();
+    const name = e && e.name ? e.name : "";
+    let msg;
+    if (name === "NotAllowedError" || name === "SecurityError")
+      msg = "Kameran käyttö estettiin. Salli kamera selaimen asetuksista ja yritä uudelleen, tai syötä viivakoodi käsin.";
+    else if (name === "NotFoundError" || name === "OverconstrainedError")
+      msg = "Kameraa ei löytynyt tältä laitteelta. Syötä viivakoodi käsin.";
+    else
+      msg = "Kameraa ei voitu avata" + (name ? " (" + name + ")" : "") + ". Syötä viivakoodi käsin.";
+    openManualBarcode(msg);
+  }
+}
+
+// Vahtikoira: jos kuvaa ei ala kuulua muutamassa sekunnissa, kerro siitä
+function watchCamera(video){
+  setTimeout(() => {
+    if (scanState.active && (!video.videoWidth || video.videoHeight === 0)){
+      scanStatus("Kamerakuva ei käynnisty — sulje ja yritä uudelleen tai syötä koodi käsin.");
+    } else if (scanState.active){
+      scanStatus("");
+    }
+  }, 3500);
+}
+
+function stopScanner(){
+  scanState.active = false;
+  if (scanState.raf) cancelAnimationFrame(scanState.raf);
+  if (scanState.reader){ try { scanState.reader.reset(); } catch(e){} scanState.reader = null; }
+  if (scanState.stream){ scanState.stream.getTracks().forEach(t => t.stop()); scanState.stream = null; }
+  const video = document.getElementById("scan-video");
+  if (video) video.srcObject = null;
+  const scr = document.getElementById("scanner");
+  scr.classList.remove("show"); scr.setAttribute("aria-hidden","true");
+  scanStatus("");
+}
+
+let zxingLoading = null;
+function loadZXing(){
+  if (window.ZXing) return Promise.resolve();
+  if (zxingLoading) return zxingLoading;
+  zxingLoading = new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js";
+    s.onload = res;
+    s.onerror = () => { zxingLoading = null; rej(new Error("verkkovirhe")); };
+    document.head.appendChild(s);
+  });
+  return zxingLoading;
+}
+
+function manualBarcode(note){
+  stopScanner();
+  openManualBarcode(note);
+}
+function openManualBarcode(note){
+  sheet.innerHTML = `
+    <h3>Syötä viivakoodi</h3>
+    ${note ? `<div class="hint" style="background:var(--warn-bg);color:var(--warn-ink);padding:10px;border-radius:10px;margin-bottom:13px">${esc(note)}</div>` : ""}
+    <div class="field"><label for="mb-code">Viivakoodin numerot</label>
+      <input id="mb-code" inputmode="numeric" placeholder="esim. 6411400000000"></div>
+    <div class="btnrow">
+      <button class="btn ghost" onclick="closeModal()">Peruuta</button>
+      <button class="btn primary" onclick="submitManualBarcode()">Hae tuote</button>
+    </div>`;
+  overlay.classList.add("show");
+  setTimeout(() => document.getElementById("mb-code").focus(), 100);
+}
+function submitManualBarcode(){
+  const code = val("mb-code").trim();
+  if (!/\d{6,}/.test(code)){ document.getElementById("mb-code").focus(); return; }
+  closeModal();
+  onBarcode(code);
+}
+
+// Käsittele löydetty viivakoodi
+async function onBarcode(code){
+  if (scanState._handling) return;
+  scanState._handling = true;
+  scanState.active = false;
+  scanStatus("Haetaan tuotetta…");
+  try {
+    const data = await lookupBarcode(code);
+    stopScanner();
+    if (data.localId){
+      openFoodModal(data.localId, { already: true });
+    } else if (data.found){
+      openFoodModal(null, { name: data.name, kcal: data.kcal, p: data.p, h: data.h, r: data.r, barcode: code, ext: data.ext });
+    } else {
+      openFoodModal(null, { name: "", kcal: "", p: "", h: "", r: "", barcode: code, notFound: true });
+    }
+  } catch(e){
+    stopScanner();
+    openFoodModal(null, { name: "", kcal: "", p: "", h: "", r: "", barcode: code, offline: true });
+  }
+}
+
+// Hae tuote: ensin paikallinen kirjasto, sitten Open Food Facts
+async function lookupBarcode(code){
+  const local = state.foods.find(f => f.barcode && f.barcode === code);
+  if (local) return { localId: local.id, name: local.name, found: true };
+  const url = "https://world.openfoodfacts.org/api/v2/product/" + encodeURIComponent(code) +
+              ".json?fields=product_name,product_name_fi,brands,nutriments";
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  let json;
+  try {
+    const res = await fetch(url, { signal: ctrl.signal });
+    json = await res.json();
+  } finally { clearTimeout(timer); }
+  return parseOFF(json, code);
+}
+
+// Jäsennä Open Food Facts -vastaus → ruoka-aineen kentät (puhdas, testattava)
+function parseOFF(json, code){
+  if (!json || json.status === 0 || !json.product) return { found: false, barcode: code };
+  const p = json.product;
+  const n = p.nutriments || {};
+  const name = (p.product_name_fi || p.product_name || "").trim();
+  const brand = (p.brands || "").split(",")[0].trim();
+  const fullName = name
+    ? (brand && !name.toLowerCase().includes(brand.toLowerCase()) ? name + " (" + brand + ")" : name)
+    : brand;
+  const kcal = n["energy-kcal_100g"] != null ? Math.round(n["energy-kcal_100g"])
+             : (n["energy_100g"] != null ? Math.round(n["energy_100g"]/4.184) : "");
+  const numOr = v => (v != null && !isNaN(v)) ? Math.round(v*10)/10 : "";
+  // Tarkemmat (luotettavat grammapohjaiset) arvot OFF:sta
+  const ext = {};
+  const setExt = (k, v) => { if (v != null && !isNaN(v)) ext[k] = Math.round(v*10)/10; };
+  setExt("sugar", n["sugars_100g"]);
+  setExt("fiber", n["fiber_100g"]);
+  setExt("satfat", n["saturated-fat_100g"]);
+  setExt("monofat", n["monounsaturated-fat_100g"]);
+  setExt("polyfat", n["polyunsaturated-fat_100g"]);
+  if (n["salt_100g"] != null) setExt("salt", n["salt_100g"]);
+  else if (n["sodium_100g"] != null) setExt("salt", n["sodium_100g"] * 2.5);
+  return {
+    found: !!(fullName || kcal !== ""),
+    barcode: code,
+    name: fullName || "",
+    kcal, p: numOr(n["proteins_100g"]), h: numOr(n["carbohydrates_100g"]), r: numOr(n["fat_100g"]),
+    ext,
+  };
+}
+
+// ============ PWA (manifest + service worker) ============
+function initPWA(){
+  // Sovelluskuvake SVG-muodossa
+  const icon = "data:image/svg+xml," + encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>" +
+    "<rect width='512' height='512' rx='112' fill='#0E100D'/>" +
+    "<rect x='176' y='176' width='160' height='160' rx='28' fill='#BFEF45' transform='rotate(45 256 256)'/></svg>");
+  const manifest = {
+    name: "Makrolista", short_name: "Makrolista",
+    description: "Makrojen, aterioiden ja kauppalistan seuranta",
+    start_url: ".", scope: ".", display: "standalone",
+    background_color: "#0E100D", theme_color: "#0E100D", lang: "fi",
+    icons: [{ src: icon, sizes: "any", type: "image/svg+xml", purpose: "any maskable" }],
+  };
+  try {
+    const blob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
+    const link = document.createElement("link");
+    link.rel = "manifest";
+    link.href = URL.createObjectURL(blob);
+    document.head.appendChild(link);
+  } catch(e){}
+
+  // Service worker: tarjoaa offline-tuen kun sovellus on ladattu vähintään kerran.
+  // Toimii vain http(s)-isännöinnissä; file://-tilassa ja jos selain estää, ohitetaan hiljaa.
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http")){
+    const sw = `
+      const C = "makrolista-cache-v2";
+      self.addEventListener("install", e => { self.skipWaiting(); });
+      self.addEventListener("activate", e => { e.waitUntil((async () => {
+        const keys = await caches.keys();
+        await Promise.all(keys.filter(k => k !== C).map(k => caches.delete(k)));
+        await self.clients.claim();
+      })()); });
+      self.addEventListener("fetch", e => {
+        if (e.request.method !== "GET") return;
+        // Network-first: haetaan aina tuorein verkosta, offline-tilassa palataan välimuistiin.
+        e.respondWith(
+          fetch(e.request).then(res => {
+            if (res && res.status === 200 && res.type === "basic"){
+              const copy = res.clone();
+              caches.open(C).then(cache => cache.put(e.request, copy));
+            }
+            return res;
+          }).catch(() => caches.open(C).then(cache => cache.match(e.request)))
+        );
+      });`;
+    try {
+      const url = URL.createObjectURL(new Blob([sw], { type: "text/javascript" }));
+      navigator.serviceWorker.register(url).catch(() => {});
+    } catch(e){}
+  }
+}
+
+// ============ KÄYNNISTYS ============
+load();
+applyTheme();
+renderAll();
+const _start = (state.profile && state.profile.startTab) || "today";
+if (_start !== "today") showTab(_start);
+initPWA();
+handleStepsHash();
+</script>
+</body>
+</html>
