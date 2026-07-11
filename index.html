@@ -1330,12 +1330,20 @@ function renderProgress(){
      <div class="h2">VESI — VIIMEISET 7 PÄIVÄÄ</div>${waterCard}`;
 }
 
-function openWeightModal(){
+function openWeightModal(preKey){
+  const todayK = dateKey(new Date());
+  const dk = preKey || todayK;
+  const existing = (state.weights && state.weights[dk] != null) ? state.weights[dk]
+                   : (dk === todayK ? (state.profile.weight || 0) : 0);
   sheet.innerHTML = `
     <h3>Kirjaa paino</h3>
-    <div class="field"><label for="wt-kg">Paino (kg)</label>
-      <input id="wt-kg" inputmode="decimal" value="${fmtKg(state.profile.weight || 0)}" placeholder="esim. 79,5"></div>
-    <div class="hint">Tallentuu tämän päivän painoksi ja päivittää profiilin painon.</div>
+    <div class="prow">
+      <div class="pf" style="flex:1"><label for="wt-date">Päivämäärä</label>
+        <input id="wt-date" type="date" max="${todayK}" value="${dk}" onchange="wtDateChanged()"></div>
+      <div class="pf" style="flex:1"><label for="wt-kg">Paino (kg)</label>
+        <input id="wt-kg" inputmode="decimal" value="${existing ? fmtKg(existing) : ''}" placeholder="esim. 79,5"></div>
+    </div>
+    <div class="hint">Voit kirjata painon valitulle päivälle. Tämän päivän kirjaus päivittää myös profiilin painon.</div>
     <div class="btnrow">
       <button class="btn ghost" onclick="closeModal()">Peruuta</button>
       <button class="btn primary" onclick="saveWeight()">Tallenna</button>
@@ -1343,14 +1351,27 @@ function openWeightModal(){
   overlay.classList.add("show");
   setTimeout(() => document.getElementById("wt-kg").focus(), 100);
 }
+function wtDateChanged(){
+  const el = document.getElementById("wt-date");
+  if (!el) return;
+  const dk = el.value;
+  const todayK = dateKey(new Date());
+  const w = (state.weights && state.weights[dk] != null) ? state.weights[dk]
+            : (dk === todayK ? (state.profile.weight || 0) : 0);
+  const kgEl = document.getElementById("wt-kg");
+  if (kgEl) kgEl.value = w ? fmtKg(w) : "";
+}
 function saveWeight(){
   const kg = num("wt-kg");
   if (kg <= 0){ document.getElementById("wt-kg").focus(); return; }
-  state.weights[dateKey(new Date())] = kg;
-  state.profile.weight = kg;
-  applyCalculated();
+  const todayK = dateKey(new Date());
+  const dateEl = document.getElementById("wt-date");
+  let dk = (dateEl && dateEl.value) ? dateEl.value : todayK;
+  if (dk > todayK) dk = todayK;
+  state.weights[dk] = kg;
+  if (dk === todayK){ state.profile.weight = kg; applyCalculated(); }
   save(); closeModal(); renderProgress(); renderToday();
-  toast("Paino kirjattu.");
+  toast(dk === todayK ? "Paino kirjattu." : "Paino kirjattu " + dk.split("-").reverse().join(".") + ".");
 }
 function setWaterTarget(v){
   const l = parseFloat(String(v).replace(",", ".")) || 0;
